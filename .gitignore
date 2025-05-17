@@ -1,0 +1,14 @@
+# PyCharm-specific files
+.idea/
+
+# Terraform-related files
+*.tfstate
+*.tfstate.backup
+.terraform/
+
+# Local configuration and secret files
+terraform.tfvars
+*.tfvars
+*.tfvars.json
+/Users/mwu/Documents/ee-data-eng-bootcamp-2025/gcp_secrets/ee-india-se-data-beaa0dcf6aec.json
+/Users/mwu/Documents/ee-data-eng-bootcamp-2025/sample_files/sample_file.txt
