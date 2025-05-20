@@ -44,8 +44,10 @@ jobs:
           echo "TF_VAR_snowflake_org=${{ secrets.SNOWFLAKE_ORG }}" >> $GITHUB_ENV
 
       # Set the environment variable for sample_file_name
-      - name: Set sample_file_name variable
-        run: echo "TF_VAR_sample_file_name=${{ secrets.SAMPLE_FILE_NAME }}" >> $GITHUB_ENV
+      - name: Set Terraform Variables
+        run: | 
+          echo "TF_VAR_sample_file_name=${{ secrets.SAMPLE_FILE_NAME }}" >> $GITHUB_ENV
+          echo "TF_VAR_taxi_trip_raw_table=${{ secrets.TAXI_TRIP_RAW_TABLE }}" >> GITHUB_ENV
 
       # Debug Variables
       - name: Debug variables
