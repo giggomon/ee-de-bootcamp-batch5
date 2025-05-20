@@ -80,23 +80,10 @@ resource "google_storage_bucket" "landing_bucket" {
 }
 
 resource "google_storage_bucket_object" "upload_file" {
-  bucket = google_storage_bucket.landing_bucket.name
-  name   = var.sample_file_name
-  source = "../resources/sample_file.txt"
+  bucket       = google_storage_bucket.landing_bucket.name
+  name         = var.sample_file_name
+  source       = "../resources/sample_file.txt"
   content_type = "text/plain"
-
-  # Add metadata
-  metadata = {
-    created_by = "terraform"
-    purpose    = "sample_data"
-  }
-  lifecycle {
-    ignore_changes = [
-      source,
-      content_type,
-      detect_md5hash
-    ]
-  }
 
   depends_on = [google_storage_bucket.landing_bucket]
 }
