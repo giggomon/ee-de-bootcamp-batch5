@@ -3,7 +3,7 @@ name: Terraform CI/CD
 on:
   push:
     branches:
-      - 'feature/*' # Matches any branch starting with "feature/"
+      - '**'     # this matches all branches, trigger the pipeline for any branch on push
       - 'main'
   pull_request:
     branches:
