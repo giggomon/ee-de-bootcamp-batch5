@@ -13,4 +13,4 @@ terraform.tfvars
 
 # Ignore secrets and sample files by relative path
 gcp_secrets/
-sample_files/
+resources/

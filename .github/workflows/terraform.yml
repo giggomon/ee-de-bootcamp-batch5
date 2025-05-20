@@ -1,0 +1,66 @@
+name: Terraform CI/CD
+
+on:
+  push:
+    branches:
+      - 'feature/*' # Matches any branch starting with "feature/"
+      - 'main'
+  pull_request:
+    branches:
+      - 'main' # This ensures the workflow runs for pull requests to the main branch
+
+jobs:
+  terraform:
+    name: Terraform Workflow
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Authenticate with GCP
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+            credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+      # Set up Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.6
+
+      # Set environment variable for sample_file_name
+      - name: Set sample_file_name variable
+        run: echo "TF_VAR_sample_file_name=${{ secrets.SAMPLE_FILE_NAME }}" >> $GITHUB_ENV
+
+      # Debug Variables
+      - name: Debug variables
+        run: echo "Sample file name:$TF_VAR_sample_file_name"
+
+      # Terraform Init
+      - name: Terraform Init
+        run: terraform -chdir=terraform init
+
+      # Terraform Validate
+      - name: Terraform Validate
+        run: terraform -chdir=terraform validate
+
+      # Terraform Format (Optional)
+      - name: Terraform Format
+        run: terraform -chdir=terraform fmt -check
+
+      # Terraform Plan
+      -  name: Terraform Plan
+         run: terraform -chdir=terraform plan
+
+      # Terraform Apply (Only on Pushes)
+      - name: Terraform Apply
+        run: |
+          if ! gcloud storage buckets describe gs://${{ secrets.GCS_BUCKET_NAME }} --format="value(name)" ; then
+            echo "Bucket does not exist. Creating it now..."
+            terraform -chdir=terraform apply -auto-approve
+          else
+            echo "Bucket exists. No need to create it."
+          fi
