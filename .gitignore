@@ -14,3 +14,9 @@ terraform.tfvars
 # Ignore secrets and sample files by relative path
 gcp_secrets/
 resources/
+
+# Airflow
+airflow/logs/
+airflow/*.cfg
+airflow/*.pid
+airflow/*.db
