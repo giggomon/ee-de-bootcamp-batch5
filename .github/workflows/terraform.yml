@@ -79,8 +79,5 @@ jobs:
             echo "Bucket exists. No need to create it."
           fi
 
-      - name: Deploy DAGs to GCS bucket
-        run: |
-          gsutil -m cp -r ./airflow/dags/* gs://${{ secrets.GCS_BUCKET_NAME }}/dags/
 
 
