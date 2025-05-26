@@ -247,6 +247,6 @@ resource "snowflake_table" "taxi_trips_raw" {
     }
   }
 
-  comment = "Raw taxi trip data loaded from GCS"
+  comment    = "Raw taxi trip data loaded from GCS"
   depends_on = [snowflake_schema.schema]
 }
