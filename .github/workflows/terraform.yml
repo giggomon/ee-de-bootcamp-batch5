@@ -73,11 +73,14 @@ jobs:
       - name: Terraform Apply
         run: |
           if ! gcloud storage buckets describe gs://${{ secrets.GCS_BUCKET_NAME }} --format="value(name)" ; then
-            echo "Bucket does not exist. Creating it now..."
-            terraform -chdir=terraform apply -auto-approve
+          echo "Bucket does not exist. Creating all resources..."
+          terraform -chdir=terraform apply -auto-approve
           else
-            echo "Bucket exists. No need to create it."
+          echo "Bucket exists. Applying other changes..."
+          # Temporarily remove the prevent_destroy lifecycle rule for the bucket
+          terraform -chdir=terraform apply -auto-approve -target=snowflake_schema.schema -target=snowflake_table.taxi_trips_raw
           fi
+        
 
 
 
