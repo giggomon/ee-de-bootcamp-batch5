@@ -99,12 +99,6 @@ resource "snowflake_table" "taxi_trips_raw" {
   schema   = var.snowflake_schema
   name     = var.taxi_trip_raw_table
 
-  # Clustering key for better query performance
-  cluster_by = ["tpep_pickup_datetime"]
-
-  # Data retention days
-  data_retention_time_in_days = 90
-
   column {
     name     = "vendor_name"
     type     = "STRING"
