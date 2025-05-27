@@ -99,15 +99,9 @@ resource "snowflake_table" "taxi_trips_raw" {
   schema   = var.snowflake_schema
   name     = var.taxi_trip_raw_table
 
-  # Clustering key for better query performance
-  cluster_by = ["tpep_pickup_datetime"]
-
-  # Data retention days
-  data_retention_time_in_days = 90
-
   column {
     name     = "vendor_name"
-    type     = "VARCHAR(50)"
+    type     = "STRING"
     nullable = true
   }
 
@@ -125,115 +119,115 @@ resource "snowflake_table" "taxi_trips_raw" {
 
   column {
     name     = "passenger_count"
-    type     = "NUMBER(3, 0)"
+    type     = "STRING"
     nullable = true
   }
 
   column {
     name     = "trip_distance"
-    type     = "FLOAT"
+    type     = "STRING"
     nullable = true
   }
 
   column {
     name     = "pickup_longitude"
-    type     = "FLOAT"
+    type     = "STRING"
     nullable = true
   }
 
   column {
     name     = "pickup_latitude"
-    type     = "FLOAT"
+    type     = "STRING"
     nullable = true
   }
 
   column {
     name     = "RatecodeID"
-    type     = "NUMBER(1, 0)"
+    type     = "STRING"
     nullable = true
   }
 
   column {
     name     = "store_and_fwd_flag"
-    type     = "CHAR(1)"
+    type     = "STRING"
     nullable = true
   }
 
   column {
     name     = "dropoff_longitude"
-    type     = "FLOAT"
+    type     = "STRING"
     nullable = true
   }
 
   column {
     name     = "dropoff_latitude"
-    type     = "FLOAT"
+    type     = "STRING"
     nullable = true
   }
 
   column {
     name     = "payment_type"
-    type     = "NUMBER(1, 0)"
+    type     = "STRING"
     nullable = true
   }
 
   column {
     name     = "payment_type_name"
-    type     = "VARCHAR(20)"
+    type     = "STRING"
     nullable = true
   }
 
   column {
     name     = "fare_amount"
-    type     = "NUMBER(10, 2)"
+    type     = "STRING"
     nullable = true
   }
 
   column {
     name     = "extra"
-    type     = "NUMBER(10, 2)"
+    type     = "STRING"
     nullable = true
   }
 
   column {
     name     = "mta_tax"
-    type     = "NUMBER(10,2)"
+    type     = "STRING"
     nullable = true
   }
 
   column {
     name     = "tip_amount"
-    type     = "NUMBER(10,2)"
+    type     = "STRING"
     nullable = true
   }
 
   column {
     name     = "tolls_amount"
-    type     = "NUMBER(10,2)"
+    type     = "STRING"
     nullable = true
   }
 
   column {
     name     = "improvement_surcharge"
-    type     = "NUMBER(10,2)"
+    type     = "STRING"
     nullable = true
   }
 
   column {
     name     = "total_amount"
-    type     = "NUMBER(10,2)"
+    type     = "STRING"
     nullable = true
   }
 
   column {
     name     = "trip_duration_minutes"
-    type     = "NUMBER(10,2)"
+    type     = "STRING"
     nullable = true
   }
 
   column {
     name     = "trip_speed_mph"
-    type     = "FLOAT"
+    type     = "STRING"
     nullable = true
   }
 
@@ -247,11 +241,6 @@ resource "snowflake_table" "taxi_trips_raw" {
     }
   }
 
-  comment = "Raw taxi trip data loaded from GCS"
-
-  lifecycle {
-    prevent_destroy = true
-  }
-
+  comment    = "Raw taxi trip data loaded from GCS"
   depends_on = [snowflake_schema.schema]
 }
