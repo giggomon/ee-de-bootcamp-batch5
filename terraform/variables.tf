@@ -97,3 +97,8 @@ variable "taxi_trip_raw_table" {
   description = "Taxi Trip Raw Table"
   type        = string
 }
+
+variable "snowflake_storage_integration" {
+  description = "Name of the existing Snowflake Storage Integration to use"
+  type        = string
+}

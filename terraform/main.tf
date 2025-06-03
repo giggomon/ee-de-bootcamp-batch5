@@ -244,3 +244,14 @@ resource "snowflake_table" "taxi_trips_raw" {
   comment    = "Raw taxi trip data loaded from GCS"
   depends_on = [snowflake_schema.schema]
 }
+
+resource "snowflake_stage" "gcs_taxi_stage" {
+  name                = "GCS_TAXI_STAGE"
+  database            = var.snowflake_database
+  schema              = var.snowflake_schema
+  url                 = "gcs://${var.bucket_name}/"
+  storage_integration = var.snowflake_storage_integration
+
+  comment    = "External stage to load taxi trip data from GCS bucket using pre-created integration"
+  depends_on = [snowflake_schema.schema]
+}
