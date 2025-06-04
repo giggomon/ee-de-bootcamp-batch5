@@ -42,7 +42,7 @@ jobs:
           echo "TF_VAR_snowflake_database=${{ secrets.SNOWFLAKE_DATABASE }}" >> $GITHUB_ENV
           echo "TF_VAR_snowflake_schema=${{ secrets.SNOWFLAKE_SCHEMA }}" >> $GITHUB_ENV
           echo "TF_VAR_snowflake_org=${{ secrets.SNOWFLAKE_ORG }}" >> $GITHUB_ENV
-          echo "TF_VAR_snowflake_snowflake_storage_integration=${{ secrets.SNOWFLAKE_STORAGE_INTEGRATION }}" >> $GITHUB_ENV
+          echo "TF_VAR_snowflake_storage_integration=${{ secrets.SNOWFLAKE_STORAGE_INTEGRATION }}" >> $GITHUB_ENV
 
 
       # Set the environment variable for sample_file_name
