@@ -100,7 +100,7 @@ resource "snowflake_table" "taxi_trips_raw" {
   name     = var.taxi_trip_raw_table
 
   column {
-    name     = "vendor_name"
+    name     = "VendorId"
     type     = "STRING"
     nullable = true
   }
@@ -172,12 +172,6 @@ resource "snowflake_table" "taxi_trips_raw" {
   }
 
   column {
-    name     = "payment_type_name"
-    type     = "STRING"
-    nullable = true
-  }
-
-  column {
     name     = "fare_amount"
     type     = "STRING"
     nullable = true
@@ -234,7 +228,7 @@ resource "snowflake_table" "taxi_trips_raw" {
   column {
     name     = "created_timestamp"
     type     = "TIMESTAMP_NTZ"
-    nullable = false
+    #nullable = true
 
     default {
       expression = "CURRENT_TIMESTAMP()"
@@ -243,6 +237,19 @@ resource "snowflake_table" "taxi_trips_raw" {
 
   comment    = "Raw taxi trip data loaded from GCS"
   depends_on = [snowflake_schema.schema]
+}
+
+resource "snowflake_file_format" "csv_format" {
+  name     = "CSV_FORMAT"
+  database = var.snowflake_database
+  schema   = var.snowflake_schema
+
+  format_type         = "CSV"
+  field_delimiter     = ","
+  null_if             = ["\\N", "NULL", "null", ""]
+  empty_field_as_null = true
+  trim_space          = true
+  parse_header        = true
 }
 
 resource "snowflake_stage" "gcs_taxi_stage" {
