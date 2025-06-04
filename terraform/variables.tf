@@ -102,3 +102,8 @@ variable "snowflake_storage_integration" {
   description = "Name of the existing Snowflake Storage Integration to use"
   type        = string
 }
+
+variable "taxi_trip_staging_table" {
+  description = "Taxi Trip Staging Table"
+  type        = string
+}

@@ -100,7 +100,7 @@ resource "snowflake_table" "taxi_trips_raw" {
   name     = var.taxi_trip_raw_table
 
   column {
-    name     = "VendorId"
+    name     = "VendorID"
     type     = "STRING"
     nullable = true
   }
@@ -260,5 +260,140 @@ resource "snowflake_stage" "gcs_taxi_stage" {
   storage_integration = var.snowflake_storage_integration
 
   comment    = "External stage to load taxi trip data from GCS bucket using pre-created integration"
+  depends_on = [snowflake_schema.schema]
+}
+
+resource "snowflake_table" "taxi_trips_staging" {
+  database = var.snowflake_database
+  schema   = var.snowflake_schema
+  name     = var.taxi_trip_staging_table
+
+  column {
+    name     = "VendorID"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "tpep_pickup_datetime"
+    type     = "TIMESTAMP_NTZ"
+    nullable = false
+  }
+
+  column {
+    name     = "tpep_dropoff_datetime"
+    type     = "TIMESTAMP_NTZ"
+    nullable = false
+  }
+
+  column {
+    name     = "passenger_count"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "trip_distance"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "pickup_longitude"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "pickup_latitude"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "RatecodeID"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "store_and_fwd_flag"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "dropoff_longitude"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "dropoff_latitude"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "payment_type"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "fare_amount"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "extra"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "mta_tax"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "tip_amount"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "tolls_amount"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "improvement_surcharge"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "total_amount"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "trip_duration_minutes"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "trip_speed_mph"
+    type     = "STRING"
+    nullable = true
+  }
+
+  comment    = "Staging table for taxi trips"
   depends_on = [snowflake_schema.schema]
 }
