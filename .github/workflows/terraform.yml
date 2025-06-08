@@ -89,7 +89,7 @@ jobs:
       - name: Import existing Snowflake schema if it exists
         run: |
           # Attempt to import the schema only if it already exists
-          SCHEMA_ID="${{ secrets.SNOWFLAKE_DATABASE }}|${{ secrets.SNOWFLAKE_SCHEMA }}"
+          SCHEMA_ID="${{ secrets.SNOWFLAKE_DATABASE }}.${{ secrets.SNOWFLAKE_SCHEMA }}"
           
           # Try to import it; ignore error if it doesn't exist
           terraform -chdir=terraform import snowflake_schema.schema "$SCHEMA_ID" || echo "Schema not found, will be created by Terraform"
@@ -98,7 +98,7 @@ jobs:
       - name: Import existing Snowflake file format if it exists
         run: |
           # Format: <database>|<schema>|<file_format_name>
-          FILE_FORMAT_ID="${{ secrets.SNOWFLAKE_DATABASE }}|${{ secrets.SNOWFLAKE_SCHEMA }}|CSV_FORMAT"
+          FILE_FORMAT_ID="${{ secrets.SNOWFLAKE_DATABASE }}.${{ secrets.SNOWFLAKE_SCHEMA }}|CSV_FORMAT"
           terraform -chdir=terraform import snowflake_file_format.csv_format "$FILE_FORMAT_ID" || echo "File format not found, will be created"
 
 
