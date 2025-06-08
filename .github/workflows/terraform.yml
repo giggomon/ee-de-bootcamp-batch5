@@ -72,6 +72,15 @@ jobs:
       -  name: Terraform Plan
          run: terraform -chdir=terraform plan
 
+      # Terrafrom import Schema (only if it exists)
+      - name: Import existing Snowflake schema if it exists
+        run: |
+          # Attempt to import the schema only if it already exists
+          SCHEMA_ID="${{ secrets.SNOWFLAKE_DATABASE }}|${{ secrets.SNOWFLAKE_SCHEMA }}"
+          
+          # Try to import it; ignore error if it doesn't exist
+          terraform -chdir=terraform import snowflake_schema.schema "$SCHEMA_ID" || echo "Schema not found, will be created by Terraform"
+
       # Terraform Apply (Only on Pushes)
       - name: Terraform Apply
         run: |
@@ -81,7 +90,8 @@ jobs:
           else
           echo "Bucket exists. Applying other changes..."
           # Temporarily remove the prevent_destroy lifecycle rule for the bucket
-          terraform -chdir=terraform apply -auto-approve -target=snowflake_schema.schema -target=snowflake_table.taxi_trips_raw
+          # terraform -chdir=terraform apply -auto-approve -target=snowflake_schema.schema -target=snowflake_table.taxi_trips_raw
+          terraform -chdir=terraform apply -auto-approve
           fi
         
   airflow-test:

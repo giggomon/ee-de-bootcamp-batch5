@@ -92,11 +92,6 @@ resource "snowflake_schema" "schema" {
   name     = var.snowflake_schema # Name of the schema
   database = var.snowflake_database
   comment  = "Create Schema for MONICA"
-
-  lifecycle {
-    prevent_destroy = true
-    ignore_changes  = []
-  }
 }
 
 resource "snowflake_table" "taxi_trips_raw" {
