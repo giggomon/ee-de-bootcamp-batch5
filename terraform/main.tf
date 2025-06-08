@@ -61,7 +61,7 @@ resource "google_storage_bucket" "landing_bucket" {
 resource "google_storage_bucket_object" "upload_file" {
   bucket       = google_storage_bucket.landing_bucket.name
   name         = var.sample_file_name
-  source       = "resources/sample_file.txt"
+  source       = "..resources/sample_file.txt"
   content_type = "text/plain"
 
   depends_on = [google_storage_bucket.landing_bucket]
