@@ -19,6 +19,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Ensure sample file exists
+      - name: Ensure sample file exists
+        run: |
+          test -f resources/sample_file.txt && echo "File exists" || (echo "File missing" && exit 1)
+
       # Authenticate with GCP
       - name: Authenticate to GCP
         uses: google-github-actions/auth@v2
@@ -92,7 +97,6 @@ jobs:
           fi
 
       # Snowflake Schema (only if it exists) checks
-# Snowflake Schema (only if it exists) checks
       - name: Import existing Snowflake schema if it exists
         run: |
           SCHEMA_ID="${{ secrets.SNOWFLAKE_DATABASE }}.${{ secrets.SNOWFLAKE_SCHEMA }}"
@@ -115,8 +119,6 @@ jobs:
           else
             terraform -chdir=terraform import snowflake_file_format.csv_format "$FILE_FORMAT_ID" || echo "File format not found, will be created"
           fi
-
-
 
       # Terraform Apply (Only on Pushes)
       - name: Terraform Apply
