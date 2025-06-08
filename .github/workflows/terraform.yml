@@ -56,9 +56,17 @@ jobs:
       - name: Debug variables
         run: echo "Sample file name:$TF_VAR_sample_file_name"
 
-      # Terraform Init
-      - name: Terraform Init
-        run: terraform -chdir=terraform init
+      # Terraform Init with backend auth
+      - name: Terraform Init with GCS backend
+        run: |
+          echo '${{ secrets.GOOGLE_CREDENTIALS }}' > /tmp/account.json
+          export GOOGLE_APPLICATION_CREDENTIALS=/tmp/account.json
+          terraform -chdir=terraform init \
+            -backend-config="bucket=${{ secrets.GCS_BUCKET_NAME }}" \
+            -backend-config="prefix=terraform/state" \
+            -backend-config="project=${{ secrets.GCP_PROJECT_ID }}" \
+            -backend-config="credentials=/tmp/account.json"
+        shell: bash
 
       # Terraform Validate
       - name: Terraform Validate
