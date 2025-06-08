@@ -64,7 +64,6 @@ jobs:
           terraform -chdir=terraform init \
             -backend-config="bucket=${{ secrets.GCS_BUCKET_NAME }}" \
             -backend-config="prefix=terraform/state" \
-            -backend-config="project=${{ secrets.GCP_PROJECT_ID }}" \
             -backend-config="credentials=/tmp/account.json"
         shell: bash
 
