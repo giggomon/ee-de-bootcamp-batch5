@@ -83,23 +83,39 @@ jobs:
       - name: Import existing GCS bucket if it exists
         run: |
           BUCKET_NAME="${{ secrets.GCS_BUCKET_NAME }}"
-          terraform -chdir=terraform import google_storage_bucket.landing_bucket "$BUCKET_NAME" || echo "Bucket not found, will be created"
+          
+          # Check if it's already in the state
+          if ! terraform -chdir=terraform state list | grep -q "google_storage_bucket.landing_bucket"; then
+            terraform -chdir=terraform import google_storage_bucket.landing_bucket "$BUCKET_NAME"
+          else
+            echo "Bucket already managed by Terraform, skipping import."
+          fi
 
       # Snowflake Schema (only if it exists) checks
+# Snowflake Schema (only if it exists) checks
       - name: Import existing Snowflake schema if it exists
         run: |
-          # Attempt to import the schema only if it already exists
           SCHEMA_ID="${{ secrets.SNOWFLAKE_DATABASE }}.${{ secrets.SNOWFLAKE_SCHEMA }}"
-          
-          # Try to import it; ignore error if it doesn't exist
-          terraform -chdir=terraform import snowflake_schema.schema "$SCHEMA_ID" || echo "Schema not found, will be created by Terraform"
+      
+          # Check if schema is already managed
+          if terraform -chdir=terraform state list | grep -q "snowflake_schema.schema"; then
+            echo "Schema already managed by Terraform, skipping import."
+          else
+            terraform -chdir=terraform import snowflake_schema.schema "$SCHEMA_ID" || echo "Schema not found, will be created by Terraform"
+          fi
+
 
       # Snowflake File format (only if it exists) checks
       - name: Import existing Snowflake file format if it exists
         run: |
-          # Format: <database>|<schema>|<file_format_name>
           FILE_FORMAT_ID="${{ secrets.SNOWFLAKE_DATABASE }}|${{ secrets.SNOWFLAKE_SCHEMA }}|CSV_FORMAT"
-          terraform -chdir=terraform import snowflake_file_format.csv_format "$FILE_FORMAT_ID" || echo "File format not found, will be created"
+      
+          if terraform -chdir=terraform state list | grep -q "snowflake_file_format.csv_format"; then
+            echo "File format already managed by Terraform, skipping import."
+          else
+            terraform -chdir=terraform import snowflake_file_format.csv_format "$FILE_FORMAT_ID" || echo "File format not found, will be created"
+          fi
+
 
 
       # Terraform Apply (Only on Pushes)
