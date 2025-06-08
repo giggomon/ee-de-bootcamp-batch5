@@ -48,27 +48,6 @@ resource "google_storage_bucket" "landing_bucket" {
     enabled = true
   }
 
-  # Lifecycle management
-  lifecycle_rule {
-    condition {
-      age = 120 # days move to cold storage after 120 days
-    }
-    action {
-      type          = "SetStorageClass"
-      storage_class = "COLDLINE"
-    }
-  }
-  # Auto-delete old versions after 1 year
-  lifecycle_rule {
-    condition {
-      age        = 365
-      with_state = "ARCHIVED"
-    }
-    action {
-      type = "Delete"
-    }
-  }
-
   # Protection against accidental deletion
   lifecycle {
     prevent_destroy = true
