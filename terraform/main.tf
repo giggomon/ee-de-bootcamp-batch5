@@ -48,27 +48,6 @@ resource "google_storage_bucket" "landing_bucket" {
     enabled = true
   }
 
-  # Lifecycle management
-  lifecycle_rule {
-    condition {
-      age = 120 # days move to cold storage after 120 days
-    }
-    action {
-      type          = "SetStorageClass"
-      storage_class = "COLDLINE"
-    }
-  }
-  # Auto-delete old versions after 1 year
-  lifecycle_rule {
-    condition {
-      age        = 365
-      with_state = "ARCHIVED"
-    }
-    action {
-      type = "Delete"
-    }
-  }
-
   # Protection against accidental deletion
   lifecycle {
     prevent_destroy = true
@@ -82,7 +61,7 @@ resource "google_storage_bucket" "landing_bucket" {
 resource "google_storage_bucket_object" "upload_file" {
   bucket       = google_storage_bucket.landing_bucket.name
   name         = var.sample_file_name
-  source       = "../resources/sample_file.txt"
+  source       = "${path.module}/../resources/sample_file.txt"
   content_type = "text/plain"
 
   depends_on = [google_storage_bucket.landing_bucket]
@@ -100,7 +79,7 @@ resource "snowflake_table" "taxi_trips_raw" {
   name     = var.taxi_trip_raw_table
 
   column {
-    name     = "vendor_name"
+    name     = "VendorID"
     type     = "STRING"
     nullable = true
   }
@@ -172,7 +151,170 @@ resource "snowflake_table" "taxi_trips_raw" {
   }
 
   column {
-    name     = "payment_type_name"
+    name     = "fare_amount"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "extra"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "mta_tax"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "tip_amount"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "tolls_amount"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "improvement_surcharge"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "total_amount"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "trip_duration_minutes"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "trip_speed_mph"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name = "created_timestamp"
+    type = "TIMESTAMP_NTZ"
+    #nullable = true
+
+    default {
+      expression = "CURRENT_TIMESTAMP()"
+    }
+  }
+
+  comment    = "Raw taxi trip data loaded from GCS"
+  depends_on = [snowflake_schema.schema]
+}
+
+resource "snowflake_file_format" "csv_format" {
+  name     = "CSV_FORMAT"
+  database = var.snowflake_database
+  schema   = var.snowflake_schema
+
+  format_type         = "CSV"
+  field_delimiter     = ","
+  null_if             = ["\\N", "NULL", "null", ""]
+  empty_field_as_null = true
+  trim_space          = true
+  parse_header        = true
+}
+
+resource "snowflake_stage" "gcs_taxi_stage" {
+  name                = "GCS_TAXI_STAGE"
+  database            = var.snowflake_database
+  schema              = var.snowflake_schema
+  url                 = "gcs://${var.bucket_name}/"
+  storage_integration = var.snowflake_storage_integration
+
+  comment    = "External stage to load taxi trip data from GCS bucket using pre-created integration"
+  depends_on = [snowflake_schema.schema]
+}
+
+resource "snowflake_table" "taxi_trips_staging" {
+  database = var.snowflake_database
+  schema   = var.snowflake_schema
+  name     = var.taxi_trip_staging_table
+
+  column {
+    name     = "VendorID"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "tpep_pickup_datetime"
+    type     = "TIMESTAMP_NTZ"
+    nullable = false
+  }
+
+  column {
+    name     = "tpep_dropoff_datetime"
+    type     = "TIMESTAMP_NTZ"
+    nullable = false
+  }
+
+  column {
+    name     = "passenger_count"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "trip_distance"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "pickup_longitude"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "pickup_latitude"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "RatecodeID"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "store_and_fwd_flag"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "dropoff_longitude"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "dropoff_latitude"
+    type     = "STRING"
+    nullable = true
+  }
+
+  column {
+    name     = "payment_type"
     type     = "STRING"
     nullable = true
   }
@@ -231,16 +373,6 @@ resource "snowflake_table" "taxi_trips_raw" {
     nullable = true
   }
 
-  column {
-    name     = "created_timestamp"
-    type     = "TIMESTAMP_NTZ"
-    nullable = false
-
-    default {
-      expression = "CURRENT_TIMESTAMP()"
-    }
-  }
-
-  comment    = "Raw taxi trip data loaded from GCS"
+  comment    = "Staging table for taxi trips"
   depends_on = [snowflake_schema.schema]
 }

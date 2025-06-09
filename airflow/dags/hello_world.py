@@ -10,29 +10,6 @@ GCS_BUCKET_NAME = "se-data-landing-monica"
 PROJECT_ID = 'ee-india-se-data'
 GCP_CONN_ID = 'google_cloud_default'
 
-# """Test the GCS connection and list available buckets"""
-# def test_gcs_connection():
-#     # Initialize the GCS Hook
-#     gcs_hook = GCSHook(
-#         gcp_conn_id=GCP_CONN_ID,
-#         project_id=PROJECT_ID
-#     )
-#
-#     logging.info("Attempting to connect to GCS...")
-#     buckets = gcs_hook.list_buckets()
-#     logging.info("Successfully connected to GCS!")
-#     logging.info("Available buckets:")
-#     for bucket in buckets:
-#         logging.info(f"- {bucket}")
-#     # Try to list objects in specific bucket
-#     objects = gcs_hook.list_blobs(
-#         bucket_name=GCS_BUCKET_NAME
-#     )
-#
-#     logging.info(f"\nObjects in bucket '{GCS_BUCKET_NAME}':")
-#     for obj in objects:
-#         logging.info(f"- {obj.name}")
-
 """
 Writes a hello world message to Google Cloud Storage bucket.
 """
