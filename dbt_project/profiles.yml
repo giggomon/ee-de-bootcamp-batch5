@@ -1,0 +1,14 @@
+taxi_dbt_project:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: GUSDATD-DAB70621
+      user: monicawu
+      password: M0n1c@11035354Snowflake
+      role: SE_DE_PARTICIPANT
+      database: EE_SE_DE_DB
+      warehouse: COMPUTE_WH
+      schema: MONICA
+      threads: 4
+      client_session_keep_alive: false

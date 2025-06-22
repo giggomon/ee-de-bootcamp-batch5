@@ -1,13 +1,35 @@
+import subprocess
+import logging
 from datetime import datetime
 from airflow import DAG
 from airflow.providers.snowflake.transfers.copy_into_snowflake import CopyFromExternalStageToSnowflakeOperator
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
+from airflow.operators.python import PythonOperator
 
 # Constants
 SNOWFLAKE_CONN_ID = "snowflake_conn"
 TAXI_TRIP_STAGING_TABLE = "TAXI_TRIPS_STAGING"
 TAXI_TRIP_RAW_TABLE = "TAXI_TRIPS_RAW"
 TAXI_TRIP_GCS_STAGE = "GCS_TAXI_STAGE"
+
+def run_dbt_model():
+    command = [
+        '/home/airflow/.local/bin/dbt',
+        'run',
+        '--models', 'stg_taxi_trips_consistent',  # Replace with your dbt model name
+        '--project-dir', '/opt/airflow/dbt_project',
+        '--profiles-dir', '/opt/airflow/.dbt',  # Adjust to your actual profiles directory
+    ]
+    result = subprocess.run(command, capture_output=True, text=True)
+
+    if result.returncode != 0:
+        logging.warning("DBT run failed")
+        logging.warning(result.stdout)
+        logging.warning(result.stderr)
+    else:
+        logging.info("DBT run succeeded")
+        logging.info(result.stdout)
+
 
 with DAG(
     dag_id = "load_data_taxi_trips",
@@ -51,5 +73,11 @@ with DAG(
         conn_id=SNOWFLAKE_CONN_ID,
     )
 
+    # 4. Run dbt model
+    run_dbt_task = PythonOperator(
+        task_id="run_dbt_model",
+        python_callable=run_dbt_model,
+    )
+
     # Set dependencies
-    load_to_snowflake >> insert_into_final >> verify_load
+    load_to_snowflake >> insert_into_final >> verify_load >> run_dbt_task
