@@ -21,14 +21,13 @@ provider "google" {
   region      = var.region
 }
 
+
 provider "snowflake" {
   organization_name = var.snowflake_org
   account_name      = var.snowflake_account_name
-  user              = var.snowflake_user
-  password          = var.snowflake_pwd
+  private_key_content = var.snowflake_private_key
   role              = var.snowflake_role
   warehouse         = var.snowflake_wh
-
 }
 
 # Resource: Google Cloud Storage bucket

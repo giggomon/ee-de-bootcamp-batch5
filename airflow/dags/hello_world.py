@@ -7,7 +7,6 @@ from airflow.operators.python import PythonOperator
 
 # Replace this with your GCS bucket name
 GCS_BUCKET_NAME = "se-data-landing-monica"
-PROJECT_ID = 'ee-india-se-data'
 GCP_CONN_ID = 'google_cloud_default'
 
 """
@@ -15,7 +14,7 @@ Writes a hello world message to Google Cloud Storage bucket.
 """
 
 def write_to_gcs() -> None:
-    hook = GCSHook(gcp_conn_id=GCP_CONN_ID, project_id=PROJECT_ID)
+    hook = GCSHook(gcp_conn_id=GCP_CONN_ID)
     file_name = "hello_world.txt"
     file_content = "Hello, World from Airflow!"
 
@@ -29,7 +28,7 @@ def write_to_gcs() -> None:
 
 # Function to read from GCS
 def read_from_gcs() -> None:
-    hook = GCSHook(gcp_conn_id=GCP_CONN_ID, project_id=PROJECT_ID)
+    hook = GCSHook(gcp_conn_id=GCP_CONN_ID)
     file_name = "hello_world.txt"
 
     # Download the file content

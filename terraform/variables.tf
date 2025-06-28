@@ -63,16 +63,6 @@ variable "snowflake_account_name" {
   type        = string
 }
 
-variable "snowflake_user" {
-  description = "Snowflake user"
-  type        = string
-}
-
-variable "snowflake_pwd" {
-  description = "Snowflake user password"
-  type        = string
-}
-
 variable "snowflake_role" {
   description = "Snowflake Role"
   type        = string
@@ -106,4 +96,10 @@ variable "snowflake_storage_integration" {
 variable "taxi_trip_staging_table" {
   description = "Taxi Trip Staging Table"
   type        = string
+}
+
+variable "snowflake_private_content" {
+  description = "Private key for Snowflake authentication (contents of the PEM file)"
+  type        = string
+  sensitive   = true
 }
