@@ -41,7 +41,7 @@ jobs:
         run: |
           echo "TF_VAR_snowflake_account_name=${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}" >> $GITHUB_ENV
           echo "TF_VAR_snowflake_user=${{ secrets.SNOWFLAKE_USER }}" >> $GITHUB_ENV
-          echo "TF_VAR_snowflake_private_key=${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" >> $GITHUB_ENV
+          echo "TF_VAR_snowflake_private_content=${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" >> $GITHUB_ENV
           echo "TF_VAR_snowflake_role=${{ secrets.SNOWFLAKE_ROLE }}" >> $GITHUB_ENV
           echo "TF_VAR_snowflake_wh=${{ secrets.SNOWFLAKE_WH }}" >> $GITHUB_ENV
           echo "TF_VAR_snowflake_database=${{ secrets.SNOWFLAKE_DATABASE }}" >> $GITHUB_ENV
