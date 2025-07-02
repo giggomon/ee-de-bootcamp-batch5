@@ -171,6 +171,8 @@ jobs:
         run: dbt test
 
       - name: Run dbt models
+        working-directory: dbt_project
+        run: dbt run
 
   airflow-test:
     name: Test Airflow DAGs
@@ -223,4 +225,3 @@ jobs:
           
           # Parse all DAGs
           airflow dags list
-          
