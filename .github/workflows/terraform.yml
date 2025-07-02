@@ -54,8 +54,8 @@ jobs:
           key: |
             ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
         run: |
-          echo "$key"
-          echo "$key" >> $GITHUB_ENV
+          echo "TF_VAR_snowflake_private_key=$key"
+
 
       # Set the environment variable for sample_file_name
       - name: Set Terraform Variables
