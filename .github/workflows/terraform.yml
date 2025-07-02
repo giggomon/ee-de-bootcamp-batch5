@@ -36,12 +36,12 @@ jobs:
         with:
           terraform_version: 1.5.6
 
-      # Add environment variables for Snowflake
+      # Add environment variables for Snowflake (Remove password since we're using key-pair auth)
       - name: Set Snowflake variables
         run: |
           echo "TF_VAR_snowflake_account_name=${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}" >> $GITHUB_ENV
           echo "TF_VAR_snowflake_user=${{ secrets.SNOWFLAKE_USER }}" >> $GITHUB_ENV
-          echo "TF_VAR_snowflake_pwd=${{ secrets.SNOWFLAKE_PWD }}" >> $GITHUB_ENV
+          echo "TF_VAR_snowflake_private_key=${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" >> $GITHUB_ENV
           echo "TF_VAR_snowflake_role=${{ secrets.SNOWFLAKE_ROLE }}" >> $GITHUB_ENV
           echo "TF_VAR_snowflake_wh=${{ secrets.SNOWFLAKE_WH }}" >> $GITHUB_ENV
           echo "TF_VAR_snowflake_database=${{ secrets.SNOWFLAKE_DATABASE }}" >> $GITHUB_ENV
@@ -81,8 +81,8 @@ jobs:
         run: terraform -chdir=terraform fmt -check
 
       # Terraform Plan
-      -  name: Terraform Plan
-         run: terraform -chdir=terraform plan
+      - name: Terraform Plan
+        run: terraform -chdir=terraform plan -var-file="terraform.tfvars"
 
       # GCS Bucket status (only if it exists) checks
       - name: Import existing GCS bucket if it exists
@@ -108,7 +108,6 @@ jobs:
             terraform -chdir=terraform import snowflake_schema.schema "$SCHEMA_ID" || echo "Schema not found, will be created by Terraform"
           fi
 
-
       # Snowflake File format (only if it exists) checks
       - name: Import existing Snowflake file format if it exists
         run: |
@@ -124,13 +123,11 @@ jobs:
       - name: Terraform Apply
         run: |
           if ! gcloud storage buckets describe gs://${{ secrets.GCS_BUCKET_NAME }} --format="value(name)" ; then
-          echo "Bucket does not exist. Creating all resources..."
-          terraform -chdir=terraform apply -auto-approve
+            echo "Bucket does not exist. Creating all resources..."
+            terraform -chdir=terraform apply -var-file="terraform.tfvars" -auto-approve
           else
-          echo "Bucket exists. Applying other changes..."
-          # Temporarily remove the prevent_destroy lifecycle rule for the bucket
-          # terraform -chdir=terraform apply -auto-approve -target=snowflake_schema.schema -target=snowflake_table.taxi_trips_raw
-          terraform -chdir=terraform apply -auto-approve
+            echo "Bucket exists. Applying other changes..."
+            terraform -chdir=terraform apply -var-file="terraform.tfvars" -auto-approve
           fi
 
   dbt:
@@ -216,6 +213,4 @@ jobs:
           
           # Additional tests as needed
           # For example, you could run unit tests for your DAG tasks
-
-
 

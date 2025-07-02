@@ -25,7 +25,8 @@ provider "google" {
 provider "snowflake" {
   organization_name = var.snowflake_org
   account_name      = var.snowflake_account_name
-  private_key_content = var.snowflake_private_key
+  user              = var.snowflake_user
+  private_key       = var.snowflake_private_key  # Remove base64decode since we'll pass the raw key
   role              = var.snowflake_role
   warehouse         = var.snowflake_wh
 }

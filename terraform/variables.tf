@@ -62,6 +62,10 @@ variable "snowflake_account_name" {
   description = "Snowflake account name"
   type        = string
 }
+variable "snowflake_user" {
+  description = "Snowflake user"
+  type        = string
+}
 
 variable "snowflake_role" {
   description = "Snowflake Role"
