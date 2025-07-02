@@ -18,12 +18,14 @@ x-airflow-common:
     AIRFLOW__SCHEDULER__PARSING_PROCESSES: '2'
     AIRFLOW__SCHEDULER__MIN_FILE_PROCESS_INTERVAL: '60'
     AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL: '60'
+    AIRFLOW__LOGGING__REMOTE_LOGGING: 'false'
+    AIRFLOW__LOGGING__BASE_LOG_FOLDER: '/opt/airflow/logs'
   volumes:
-    - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
+    - ./airflow/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
-    - ${AIRFLOW_PROJ_DIR:-.}/dbt_project:/opt/airflow/dbt_project
+    - ./dbt_project:/opt/airflow/dbt_project
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -77,9 +79,11 @@ services:
       airflow-init:
         condition: service_completed_successfully
     volumes:
-      - ./dags:/opt/airflow/dags
+      - ./airflow/dags:/opt/airflow/dags
+      - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
+      - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
+      - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
       - ./dbt_project:/opt/airflow/dbt_project
-
   airflow-scheduler:
     <<: *airflow-common
     command: scheduler
@@ -98,6 +102,14 @@ services:
   airflow-worker:
     <<: *airflow-common
     command: celery worker
+    hostname: airflow-worker
+    container_name: airflow-worker
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
+      - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
+      - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
+      - ./dbt_project:/opt/airflow/dbt_project
     healthcheck:
       # yamllint disable rule:line-length
       test: ["CMD-SHELL", "celery --app airflow.providers.celery.executors.celery_executor.app inspect ping -d \"celery@$${HOSTNAME}\" || celery --app airflow.executors.celery_executor.app inspect ping -d \"celery@$${HOSTNAME}\""]
@@ -165,8 +177,8 @@ services:
           echo "   https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html#before-you-begin"
           echo
         fi
-        mkdir -p /sources/logs /sources/dags /sources/plugins
-        chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
+        mkdir -p /opt/airflow/logs /opt/airflow/dags /opt/airflow/plugins
+        chown -R "${AIRFLOW_UID}:0" /opt/airflow/{logs,dags,plugins}
         exec /entrypoint airflow version
     # yamllint enable rule:line-length
     environment:
@@ -180,6 +192,7 @@ services:
     user: "0:0"
     volumes:
       - ${AIRFLOW_PROJ_DIR:-.}:/sources
+      - ./airflow/dags:/opt/airflow/dags
 
 volumes:
   postgres-db-volume:
