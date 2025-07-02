@@ -82,7 +82,7 @@ jobs:
 
       # Terraform Plan
       - name: Terraform Plan
-        run: terraform -chdir=terraform plan -var-file="terraform.tfvars"
+        run: terraform -chdir=terraform plan
 
       # GCS Bucket status (only if it exists) checks
       - name: Import existing GCS bucket if it exists
