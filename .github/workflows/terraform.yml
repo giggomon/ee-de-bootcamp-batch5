@@ -54,6 +54,7 @@ jobs:
           key: |
             ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
         run: |
+          echo $key
           echo "TF_VAR_snowflake_private_key=$key" >> $GITHUB_ENV
 
       # Set the environment variable for sample_file_name
