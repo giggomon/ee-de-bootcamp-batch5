@@ -102,7 +102,7 @@ variable "taxi_trip_staging_table" {
   type        = string
 }
 
-variable "snowflake_private_content" {
+variable "snowflake_private_key" {
   description = "Private key for Snowflake authentication (contents of the PEM file)"
   type        = string
   sensitive   = true
