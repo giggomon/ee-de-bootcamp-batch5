@@ -50,10 +50,11 @@ jobs:
 
       # Set Snowflake private key (using separate step to handle multiline content properly)
       - name: Set Snowflake private key
+        env:
+          key: |
+            ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
         run: |
-          cat <<'EOF' >> $GITHUB_ENV
-          TF_VAR_snowflake_private_key=${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
-          EOF
+          echo "TF_VAR_snowflake_private_key=${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" >> $GITHUB_ENV
 
       # Set the environment variable for sample_file_name
       - name: Set Terraform Variables
