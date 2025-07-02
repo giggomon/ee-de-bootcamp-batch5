@@ -51,10 +51,11 @@ jobs:
       # Set Snowflake private key (using separate step to handle multiline content properly)
       - name: Set Snowflake private key
         env:
-          key: |
-            ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+          PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
         run: |
-          echo "TF_VAR_snowflake_private_key=$key"
+          echo "TF_VAR_snowflake_private_content<<EOF" >> $GITHUB_ENV
+          echo "$PRIVATE_KEY" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
 
       # Set the environment variable for sample_file_name
@@ -155,11 +156,19 @@ jobs:
         run: |
           echo "SNOWFLAKE_ACCOUNT=${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}" >> $GITHUB_ENV
           echo "SNOWFLAKE_USER=${{ secrets.SNOWFLAKE_USER }}" >> $GITHUB_ENV
-          echo "SNOWFLAKE_PRIVATE_KEY=${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" >> $GITHUB_ENV
           echo "SNOWFLAKE_ROLE=${{ secrets.SNOWFLAKE_ROLE }}" >> $GITHUB_ENV
           echo "SNOWFLAKE_WAREHOUSE=${{ secrets.SNOWFLAKE_WH }}" >> $GITHUB_ENV
           echo "SNOWFLAKE_DATABASE=${{ secrets.SNOWFLAKE_DATABASE }}" >> $GITHUB_ENV
           echo "SNOWFLAKE_SCHEMA=${{ secrets.SNOWFLAKE_SCHEMA }}" >> $GITHUB_ENV
+
+      # Set Snowflake private key for dbt (using separate step to handle multiline content properly)
+      - name: Set dbt private key
+        env:
+          PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+        run: |
+          echo "SNOWFLAKE_PRIVATE_KEY<<EOF" >> $GITHUB_ENV
+          echo "$PRIVATE_KEY" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: Install dbt dependencies
         run: |
@@ -214,17 +223,25 @@ jobs:
 
       - name: Configure Airflow Environment Variables
         run: |
-          # Add Snowflake variables that your DAGs expect
+          # Add Snowflake variables that your DAGs expect (single-line variables)
           export AIRFLOW__CORE__UNIT_TEST_MODE=True
           export AIRFLOW_VAR_snowflake_account=${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}
           export AIRFLOW_VAR_snowflake_user=${{ secrets.SNOWFLAKE_USER }}
-          export AIRFLOW_VAR_snowflake_private_key=${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
           export AIRFLOW_VAR_snowflake_warehouse=${{ secrets.SNOWFLAKE_WH }}
           export AIRFLOW_VAR_snowflake_database=${{ secrets.SNOWFLAKE_DATABASE }}
           export AIRFLOW_VAR_snowflake_schema=${{ secrets.SNOWFLAKE_SCHEMA }}
           export AIRFLOW_VAR_snowflake_role=${{ secrets.SNOWFLAKE_ROLE }}
           export AIRFLOW_VAR_bucket_name=${{ secrets.GCS_BUCKET_NAME }}
           export AIRFLOW_VAR_taxi_trip_raw_table=${{ secrets.TAXI_TRIP_RAW_TABLE }}
+
+      # Set Airflow private key (using separate step to handle multiline content properly)
+      - name: Set Airflow private key
+        env:
+          PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+        run: |
+          echo "AIRFLOW_VAR_snowflake_private_key<<EOF" >> $GITHUB_ENV
+          echo "$PRIVATE_KEY" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: Validate DAGs with Airflow
         run: |
