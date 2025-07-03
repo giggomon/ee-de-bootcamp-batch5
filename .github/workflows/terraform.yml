@@ -53,11 +53,9 @@ jobs:
         env:
           PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
         run: |
-          echo "$PRIVATE_KEY"
+          echo "TF_VAR_snowflake_private_key<<EOF" >> $GITHUB_ENV
           echo "$PRIVATE_KEY" >> $GITHUB_ENV
-          echo "$GIHUB_ENV"
-          echo "TF_VAR_snowflake_private_key=$PRIVATE_KEY"
-          echo "TF_VAR_snowflake_private_key"
+          echo "EOF" >> $GITHUB_ENV
       # Set the environment variable for sample_file_name
       - name: Set Terraform Variables
         run: | 
@@ -162,11 +160,11 @@ jobs:
           echo "SNOWFLAKE_SCHEMA=${{ secrets.SNOWFLAKE_SCHEMA }}" >> $GITHUB_ENV
 
       # Set Snowflake private key for dbt (using separate step to handle multiline content properly)
-      - name: Set dbt private key
+      - name: Set Snowflake private key
         env:
           PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
         run: |
-          echo "SNOWFLAKE_PRIVATE_KEY<<EOF" >> $GITHUB_ENV
+          echo "TF_VAR_snowflake_private_key<<EOF" >> $GITHUB_ENV
           echo "$PRIVATE_KEY" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
