@@ -9,7 +9,7 @@ terraform {
     }
     snowflake = {
       source  = "Snowflake-Labs/snowflake"
-      version = "~> 0.61"
+      version = "~> 0.94"
     }
   }
 }
@@ -26,7 +26,7 @@ provider "snowflake" {
   organization_name = var.snowflake_org
   account_name      = var.snowflake_account_name
   user              = var.snowflake_user
-  private_key       = var.snowflake_private_key # Match the variable name in variables.tf
+  private_key       = var.snowflake_private_key
   role              = var.snowflake_role
   warehouse         = var.snowflake_wh
 }
