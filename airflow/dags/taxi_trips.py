@@ -13,16 +13,12 @@ TAXI_TRIP_RAW_TABLE = "TAXI_TRIPS_RAW"
 TAXI_TRIP_GCS_STAGE = "GCS_TAXI_STAGE"
 
 def run_dbt_model():
-    # logging.info("Listing project directory contents")
-    # result = subprocess.run(["ls", "-al", "/opt/airflow/dbt_project"], capture_output=True, text=True)
-    # logging.info(result.stdout)
-
     command = [
         'dbt',
         'run',
-        '--models', 'stg_taxi_trips_consistent',  # Replace with your dbt model name
+        '--models', 'stg_taxi_trips_consistent',
         '--project-dir', '/opt/airflow/dbt_project',
-        '--profiles-dir', '/opt/airflow/dbt_project',  # Adjust to your actual profiles directory
+        '--profiles-dir', '/opt/airflow/dbt_project',
     ]
     result = subprocess.run(command, capture_output=True, text=True)
     logging.info(result.stdout)
@@ -85,5 +81,4 @@ with DAG(
     )
 
     # Set dependencies
-    # load_to_snowflake >> insert_into_final >> verify_load >> run_dbt_task
-    run_dbt_task
+    load_to_snowflake >> insert_into_final >> verify_load >> run_dbt_task
