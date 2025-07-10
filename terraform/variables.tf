@@ -68,7 +68,7 @@ variable "snowflake_user" {
   type        = string
 }
 
-variable "snowflake_password" {
+variable "snowflake_pwd" {
   description = "Snowflake password"
   type        = string
 }
