@@ -14,6 +14,7 @@ terraform {
   }
 }
 
+
 # Provider configuration
 provider "google" {
   credentials = var.google_credentials != "" ? var.google_credentials : null
@@ -26,7 +27,7 @@ provider "snowflake" {
   organization_name = var.snowflake_org
   account_name      = var.snowflake_account_name
   user              = var.snowflake_user
-  private_key       = var.snowflake_private_key
+  password          = var.snowflake_password
   role              = var.snowflake_role
   warehouse         = var.snowflake_wh
 }
