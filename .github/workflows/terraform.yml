@@ -41,6 +41,7 @@ jobs:
         run: |
           echo "TF_VAR_snowflake_account_name=${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}" >> $GITHUB_ENV
           echo "TF_VAR_snowflake_user=${{ secrets.SNOWFLAKE_USER }}" >> $GITHUB_ENV
+          echo "TF_VAR_snowflake_password=${{ secrets.SNOWFLAKE_PASSWORD }}" >> $GITHUB_ENV
           echo "TF_VAR_snowflake_role=${{ secrets.SNOWFLAKE_ROLE }}" >> $GITHUB_ENV
           echo "TF_VAR_snowflake_wh=${{ secrets.SNOWFLAKE_WH }}" >> $GITHUB_ENV
           echo "TF_VAR_snowflake_database=${{ secrets.SNOWFLAKE_DATABASE }}" >> $GITHUB_ENV
@@ -154,6 +155,7 @@ jobs:
         run: |
           echo "SNOWFLAKE_ACCOUNT=${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}" >> $GITHUB_ENV
           echo "SNOWFLAKE_USER=${{ secrets.SNOWFLAKE_USER }}" >> $GITHUB_ENV
+          echo "TF_VAR_snowflake_password=${{ secrets.SNOWFLAKE_PASSWORD }}" >> $GITHUB_ENV
           echo "SNOWFLAKE_ROLE=${{ secrets.SNOWFLAKE_ROLE }}" >> $GITHUB_ENV
           echo "SNOWFLAKE_WAREHOUSE=${{ secrets.SNOWFLAKE_WH }}" >> $GITHUB_ENV
           echo "SNOWFLAKE_DATABASE=${{ secrets.SNOWFLAKE_DATABASE }}" >> $GITHUB_ENV
@@ -225,6 +227,7 @@ jobs:
           export AIRFLOW__CORE__UNIT_TEST_MODE=True
           export AIRFLOW_VAR_snowflake_account=${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}
           export AIRFLOW_VAR_snowflake_user=${{ secrets.SNOWFLAKE_USER }}
+          export AIRFLOW_VAR_snowflake_password=${{ secrets.SNOWFLAKE_PASSWORD }}" >> $GITHUB_ENV
           export AIRFLOW_VAR_snowflake_warehouse=${{ secrets.SNOWFLAKE_WH }}
           export AIRFLOW_VAR_snowflake_database=${{ secrets.SNOWFLAKE_DATABASE }}
           export AIRFLOW_VAR_snowflake_schema=${{ secrets.SNOWFLAKE_SCHEMA }}
