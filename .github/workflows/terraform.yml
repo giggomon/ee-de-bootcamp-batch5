@@ -154,13 +154,13 @@ jobs:
       # Add Snowflake environment variables for dbt
       - name: Set dbt environment variables
         run: |
-          echo "SNOWFLAKE_ACCOUNT=${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}" >> $GITHUB_ENV
-          echo "SNOWFLAKE_USER=${{ secrets.SNOWFLAKE_USER }}" >> $GITHUB_ENV
-          echo "TF_VAR_snowflake_pwd=${{ secrets.SNOWFLAKE_PASSWORD }}" >> $GITHUB_ENV
-          echo "SNOWFLAKE_ROLE=${{ secrets.SNOWFLAKE_ROLE }}" >> $GITHUB_ENV
-          echo "SNOWFLAKE_WAREHOUSE=${{ secrets.SNOWFLAKE_WH }}" >> $GITHUB_ENV
-          echo "SNOWFLAKE_DATABASE=${{ secrets.SNOWFLAKE_DATABASE }}" >> $GITHUB_ENV
-          echo "SNOWFLAKE_SCHEMA=${{ secrets.SNOWFLAKE_SCHEMA }}" >> $GITHUB_ENV
+          echo "DBT_SNOWFLAKE_ACCOUNT=${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}" >> $GITHUB_ENV
+          echo "DBT_SNOWFLAKE_USER=${{ secrets.SNOWFLAKE_USER }}" >> $GITHUB_ENV
+          echo "DBT_SNOWFLAKE_pwd=${{ secrets.SNOWFLAKE_PASSWORD }}" >> $GITHUB_ENV
+          echo "DBT_SNOWFLAKE_ROLE=${{ secrets.SNOWFLAKE_ROLE }}" >> $GITHUB_ENV
+          echo "DBT_SNOWFLAKE_WAREHOUSE=${{ secrets.SNOWFLAKE_WH }}" >> $GITHUB_ENV
+          echo "DBT_SNOWFLAKE_DATABASE=${{ secrets.SNOWFLAKE_DATABASE }}" >> $GITHUB_ENV
+          echo "DBT_SNOWFLAKE_SCHEMA=${{ secrets.SNOWFLAKE_SCHEMA }}" >> $GITHUB_ENV
 
       # Set Snowflake private key for dbt (using separate step to handle multiline content properly)
       - name: Set Snowflake private key
