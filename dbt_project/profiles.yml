@@ -3,12 +3,12 @@ taxi_dbt_project:
   outputs:
     dev:
       type: snowflake
-      account: GUSDATD-DAB70621
-      user: monicawu
-      password: M0n1c@11035354Snowflake
-      role: SE_DE_PARTICIPANT
-      database: EE_SE_DE_DB
-      warehouse: COMPUTE_WH
-      schema: MONICA
+      account: "{{ env_var('DBT_snowflake_account') }}"
+      user: "{{ env_var('DBT_snowflake_user') }}"
+      password: "{{ env_var('DBT_snowflake_pwd') }}"
+      role: "{{ env_var('DBT_snowflake_role') }}"
+      database: "{{ env_var('DBT_snowflake_database') }}"
+      warehouse: "{{ env_var('DBT_snowflake_warehouse') }}"
+      schema: "{{ env_var('DBT_snowflake_schema') }}"
       threads: 4
       client_session_keep_alive: false
