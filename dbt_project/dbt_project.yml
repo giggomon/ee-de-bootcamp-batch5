@@ -1,0 +1,13 @@
+name: taxi_dbt_project  # must match profile name below
+version: '1.0'
+
+profile: taxi_dbt_project  # must match the key in profiles.yml
+
+model-paths: ["models"]
+target-path: "target"
+clean-targets: ["target", "dbt_modules"]
+
+# Optional: customize your model folders
+# models:
+#   taxi_dbt_project:
+#     +materialized: view

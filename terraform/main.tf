@@ -9,10 +9,11 @@ terraform {
     }
     snowflake = {
       source  = "Snowflake-Labs/snowflake"
-      version = "~> 0.61"
+      version = "~> 0.87" # Try a different recent version
     }
   }
 }
+
 
 # Provider configuration
 provider "google" {
@@ -21,6 +22,7 @@ provider "google" {
   region      = var.region
 }
 
+
 provider "snowflake" {
   organization_name = var.snowflake_org
   account_name      = var.snowflake_account_name
@@ -28,7 +30,6 @@ provider "snowflake" {
   password          = var.snowflake_pwd
   role              = var.snowflake_role
   warehouse         = var.snowflake_wh
-
 }
 
 # Resource: Google Cloud Storage bucket

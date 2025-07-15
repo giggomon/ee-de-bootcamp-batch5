@@ -1,0 +1,92 @@
+version: 2
+
+models:
+  - name: stg_taxi_trips_consistent
+    description: "Cleaned and standardised taxi trips data"
+    # ──────────────────────────────────────────────────────────────
+    # • Table‑level tests •
+    # ──────────────────────────────────────────────────────────────
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "tpep_dropoff_datetime >= tpep_pickup_datetime"
+          name: pickup_before_dropoff
+
+    # ──────────────────────────────────────────────────────────────
+    # • Column‑level tests •
+    # ──────────────────────────────────────────────────────────────
+    columns:
+      - name: vendor_id
+        description: NYC TLC vendor identifier
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2]
+      - name: tpep_pickup_datetime
+        tests:
+          - not_null
+      - name: tpep_dropoff_datetime
+        tests:
+          - not_null
+      - name: passenger_count
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 9
+      - name: trip_distance
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0.0
+              max_value: 9000000.00
+      - name: pickup_longitude
+        tests:
+          - not_null
+      - name: pickup_latitude
+        tests:
+          - not_null
+      - name: ratecode_id
+        tests:
+          - not_null
+      - name: store_and_fwd_flag
+        tests:
+          - not_null
+      - name: dropoff_longitude
+        tests:
+          - not_null
+      - name: dropoff_latitude
+        tests:
+          - not_null
+      - name: payment_type
+        tests:
+          - not_null
+      - name: fare_amount
+        tests:
+          - not_null
+      - name: extra
+        tests:
+          - not_null
+      - name: mta_tax
+        tests:
+          - not_null
+      - name: tip_amount
+        tests:
+          - not_null
+      - name: tolls_amount
+        tests:
+          - not_null
+      - name: improvement_surcharge
+        tests:
+          - not_null
+      - name: total_amount
+        tests:
+          - not_null
+      - name: trip_duration_minutes
+        tests:
+          - not_null
+      - name: trip_speed_mph
+        tests:
+          - not_null
+      - name: created_timestamp
+        tests:
+          - not_null

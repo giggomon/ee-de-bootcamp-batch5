@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: MONICA
+    database: EE_SE_DE_DB
+    tables:
+      - name: taxi_trips_raw
+        description: "Raw layer of NYC taxi trips"
