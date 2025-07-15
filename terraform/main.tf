@@ -122,7 +122,7 @@ resource "snowflake_table" "taxi_trips_raw" {
   }
 
   column {
-    name     = "ratecodeID"
+    name     = "ratecodeid"
     type     = "STRING"
     nullable = true
   }
