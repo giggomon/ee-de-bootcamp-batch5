@@ -3,12 +3,12 @@ taxi_dbt_project:
   outputs:
     dev:
       type: snowflake
-      account: "{{ env_var('DBT_snowflake_account') }}"
-      user: "{{ env_var('DBT_snowflake_user') }}"
-      password: "{{ env_var('DBT_snowflake_pwd') }}"
-      role: "{{ env_var('DBT_snowflake_role') }}"
-      database: "{{ env_var('DBT_snowflake_database') }}"
-      warehouse: "{{ env_var('DBT_snowflake_warehouse') }}"
-      schema: "{{ env_var('DBT_snowflake_schema') }}"
+      account: "{{ env_var('DBT_SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('DBT_SNOWFLAKE_USER') }}"
+      password: "{{ env_var('DBT_SNOWFLAKE_PWD') }}"
+      role: "{{ env_var('DBT_SNOWFLAKE_ROLE') }}"
+      database: "{{ env_var('DBT_SNOWFLAKE_DATABASE') }}"
+      warehouse: "{{ env_var('DBT_SNOWFLAKE_WAREHOUSE') }}"
+      schema: "{{ env_var('DBT_SNOWFLAKE_SCHEMA') }}"
       threads: 4
       client_session_keep_alive: false
