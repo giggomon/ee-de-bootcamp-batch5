@@ -249,7 +249,7 @@ resource "snowflake_table" "taxi_trips_staging" {
   name     = var.taxi_trip_staging_table
 
   column {
-    name     = "VendorID"
+    name     = "vendorid"
     type     = "STRING"
     nullable = true
   }
@@ -291,7 +291,7 @@ resource "snowflake_table" "taxi_trips_staging" {
   }
 
   column {
-    name     = "RatecodeID"
+    name     = "ratecodeid"
     type     = "STRING"
     nullable = true
   }
