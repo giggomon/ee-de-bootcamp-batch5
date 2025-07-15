@@ -1,5 +1,6 @@
 import subprocess
 import logging
+import os
 from datetime import datetime
 from airflow import DAG
 from airflow.providers.snowflake.transfers.copy_into_snowflake import CopyFromExternalStageToSnowflakeOperator
@@ -16,11 +17,13 @@ def run_dbt_model():
     command = [
         'dbt',
         'run',
-        '--models', 'stg_taxi_trips_consistent',
+        '--select', 'stg_taxi_trips_consistent',
         '--project-dir', '/opt/airflow/dbt_project',
         '--profiles-dir', '/opt/airflow/dbt_project',
     ]
-    result = subprocess.run(command, capture_output=True, text=True)
+
+    env = os.environ.copy()
+    result = subprocess.run(command, capture_output=True, text=True, env=env)
     logging.info(result.stdout)
 
     if result.returncode != 0:

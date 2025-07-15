@@ -143,13 +143,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: terraform  # <-- This ensures Terraform finishes first
     env:
-      DBT_snowflake_account: ${{ secrets.SNOWFLAKE_ACCOUNT_IDENTIFIER }}
-      DBT_snowflake_user: ${{ secrets.SNOWFLAKE_USER }}
-      DBT_snowflake_pwd: ${{ secrets.SNOWFLAKE_PASSWORD }}
-      DBT_snowflake_role: ${{ secrets.SNOWFLAKE_ROLE }}
-      DBT_snowflake_warehouse: ${{ secrets.SNOWFLAKE_WH }}
-      DBT_snowflake_database: ${{ secrets.SNOWFLAKE_DATABASE }}
-      DBT_snowflake_schema: ${{ secrets.SNOWFLAKE_SCHEMA }}
+      DBT_SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT_IDENTIFIER }}
+      DBT_SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+      DBT_SNOWFLAKE_PWD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+      DBT_SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+      DBT_SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WH }}
+      DBT_SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+      DBT_SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -198,14 +198,6 @@ jobs:
           pip install snowflake-connector-python>=3.0.0
           pip install apache-airflow-providers-snowflake
 
-      - name: Test DAG syntax
-        run: |
-          # Test each DAG file for syntax errors
-          for file in airflow/dags/*.py; do
-            echo "Testing $file..."
-            python -c "import sys; from airflow.models.dag import DAG; from airflow.utils.dag_cycle_tester import check_cycle; d = __import__('$file'.replace('/', '.').replace('.py', '')).dag; check_cycle(d); print('Syntax OK')"
-          done
-
       - name: Configure Airflow Environment Variables
         run: |
           # Add Snowflake variables that your DAGs expect (single-line variables)
@@ -219,15 +211,6 @@ jobs:
           export AIRFLOW_VAR_snowflake_role=${{ secrets.SNOWFLAKE_ROLE }}
           export AIRFLOW_VAR_bucket_name=${{ secrets.GCS_BUCKET_NAME }}
           export AIRFLOW_VAR_taxi_trip_raw_table=${{ secrets.TAXI_TRIP_RAW_TABLE }}
-
-      # Set Airflow private key (using separate step to handle multiline content properly)
-      - name: Set Airflow private key
-        env:
-          PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
-        run: |
-          echo "AIRFLOW_VAR_snowflake_private_key<<EOF" >> $GITHUB_ENV
-          echo "$PRIVATE_KEY" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
 
       - name: Validate DAGs with Airflow
         run: |
