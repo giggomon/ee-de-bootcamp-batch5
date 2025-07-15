@@ -382,6 +382,7 @@ resource "snowflake_table" "taxi_trips_staging" {
     default {
       expression = "CURRENT_TIMESTAMP()"
     }
+}
 
   comment    = "Staging table for taxi trips"
   depends_on = [snowflake_schema.schema]
