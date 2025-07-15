@@ -143,7 +143,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: terraform  # <-- This ensures Terraform finishes first
     env:
-      DBT_snowflake_account: ${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}
+      DBT_snowflake_account: ${{ secrets.SNOWFLAKE_ACCOUNT_IDENTIFIER }}
       DBT_snowflake_user: ${{ secrets.SNOWFLAKE_USER }}
       DBT_snowflake_pwd: ${{ secrets.SNOWFLAKE_PASSWORD }}
       DBT_snowflake_role: ${{ secrets.SNOWFLAKE_ROLE }}
