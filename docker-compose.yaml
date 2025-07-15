@@ -119,6 +119,13 @@ services:
       start_period: 30s
     environment:
       <<: *airflow-common-env
+      DBT_SNOWFLAKE_ACCOUNT: ${DBT_SNOWFLAKE_ACCOUNT}
+      DBT_SNOWFLAKE_USER: ${DBT_SNOWFLAKE_USER}
+      DBT_SNOWFLAKE_PWD: ${DBT_SNOWFLAKE_PWD}
+      DBT_SNOWFLAKE_ROLE: ${DBT_SNOWFLAKE_ROLE}
+      DBT_SNOWFLAKE_DATABASE: ${DBT_SNOWFLAKE_DATABASE}
+      DBT_SNOWFLAKE_SCHEMA: ${DBT_SNOWFLAKE_SCHEMA}
+      DBT_SNOWFLAKE_WAREHOUSE: ${DBT_SNOWFLAKE_WAREHOUSE}
       # Required to handle warm shutdown of the celery workers properly
       # See https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
       DUMB_INIT_SETSID: "0"

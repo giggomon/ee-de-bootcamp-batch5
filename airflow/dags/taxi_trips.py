@@ -14,6 +14,11 @@ TAXI_TRIP_RAW_TABLE = "TAXI_TRIPS_RAW"
 TAXI_TRIP_GCS_STAGE = "GCS_TAXI_STAGE"
 
 def run_dbt_model():
+    env = os.environ.copy()
+    # logging.info(f"DBT_SNOWFLAKE_USER={env.get('DBT_SNOWFLAKE_USER')}")
+    # logging.info(f"DBT_SNOWFLAKE_PWD={'***' if env.get('DBT_SNOWFLAKE_PWD') else None}")
+    # logging.info(f"DBT_SNOWFLAKE_ACCOUNT={env.get('DBT_SNOWFLAKE_ACCOUNT')}")
+
     command = [
         'dbt',
         'run',
@@ -22,7 +27,6 @@ def run_dbt_model():
         '--profiles-dir', '/opt/airflow/dbt_project',
     ]
 
-    env = os.environ.copy()
     result = subprocess.run(command, capture_output=True, text=True, env=env)
     logging.info(result.stdout)
 
