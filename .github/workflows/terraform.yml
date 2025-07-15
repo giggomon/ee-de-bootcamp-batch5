@@ -143,13 +143,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: terraform  # <-- This ensures Terraform finishes first
     env:
-      DBT_snowflake_account=${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}
-      DBT_snowflake_user=${{ secrets.SNOWFLAKE_USER }}
-      DBT_snowflake_pwd=${{ secrets.SNOWFLAKE_PASSWORD }}
-      DBT_snowflake_role=${{ secrets.SNOWFLAKE_ROLE }}
-      DBT_snowflake_warehouse=${{ secrets.SNOWFLAKE_WH }}
-      DBT_snowflake_database=${{ secrets.SNOWFLAKE_DATABASE }}
-      DBT_snowflake_schema=${{ secrets.SNOWFLAKE_SCHEMA }}
+      DBT_snowflake_account: ${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}
+      DBT_snowflake_user: ${{ secrets.SNOWFLAKE_USER }}
+      DBT_snowflake_pwd: ${{ secrets.SNOWFLAKE_PASSWORD }}
+      DBT_snowflake_role: ${{ secrets.SNOWFLAKE_ROLE }}
+      DBT_snowflake_warehouse: ${{ secrets.SNOWFLAKE_WH }}
+      DBT_snowflake_database: ${{ secrets.SNOWFLAKE_DATABASE }}
+      DBT_snowflake_schema: ${{ secrets.SNOWFLAKE_SCHEMA }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
