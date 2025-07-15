@@ -80,7 +80,7 @@ resource "snowflake_table" "taxi_trips_raw" {
   name     = var.taxi_trip_raw_table
 
   column {
-    name     = "VendorID"
+    name     = "vendorid"
     type     = "STRING"
     nullable = true
   }
@@ -122,7 +122,7 @@ resource "snowflake_table" "taxi_trips_raw" {
   }
 
   column {
-    name     = "RatecodeID"
+    name     = "ratecodeID"
     type     = "STRING"
     nullable = true
   }
@@ -373,6 +373,15 @@ resource "snowflake_table" "taxi_trips_staging" {
     type     = "STRING"
     nullable = true
   }
+
+  column {
+    name = "created_timestamp"
+    type = "TIMESTAMP_NTZ"
+    #nullable = true
+
+    default {
+      expression = "CURRENT_TIMESTAMP()"
+    }
 
   comment    = "Staging table for taxi trips"
   depends_on = [snowflake_schema.schema]
