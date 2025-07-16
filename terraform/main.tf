@@ -194,18 +194,6 @@ resource "snowflake_table" "taxi_trips_raw" {
   }
 
   column {
-    name     = "trip_duration_minutes"
-    type     = "STRING"
-    nullable = true
-  }
-
-  column {
-    name     = "trip_speed_mph"
-    type     = "STRING"
-    nullable = true
-  }
-
-  column {
     name = "created_timestamp"
     type = "TIMESTAMP_NTZ"
     #nullable = true
@@ -358,18 +346,6 @@ resource "snowflake_table" "taxi_trips_staging" {
 
   column {
     name     = "total_amount"
-    type     = "STRING"
-    nullable = true
-  }
-
-  column {
-    name     = "trip_duration_minutes"
-    type     = "STRING"
-    nullable = true
-  }
-
-  column {
-    name     = "trip_speed_mph"
     type     = "STRING"
     nullable = true
   }
