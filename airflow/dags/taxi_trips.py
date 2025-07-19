@@ -1,5 +1,6 @@
 import subprocess
 import logging
+import os
 from datetime import datetime
 from airflow import DAG
 from airflow.providers.snowflake.transfers.copy_into_snowflake import CopyFromExternalStageToSnowflakeOperator
@@ -13,14 +14,20 @@ TAXI_TRIP_RAW_TABLE = "TAXI_TRIPS_RAW"
 TAXI_TRIP_GCS_STAGE = "GCS_TAXI_STAGE"
 
 def run_dbt_model():
+    env = os.environ.copy()
+    # logging.info(f"DBT_SNOWFLAKE_USER={env.get('DBT_SNOWFLAKE_USER')}")
+    # logging.info(f"DBT_SNOWFLAKE_PWD={'***' if env.get('DBT_SNOWFLAKE_PWD') else None}")
+    # logging.info(f"DBT_SNOWFLAKE_ACCOUNT={env.get('DBT_SNOWFLAKE_ACCOUNT')}")
+
     command = [
         'dbt',
         'run',
-        '--models', 'stg_taxi_trips_consistent',
+        '--select', 'stg_taxi_trips_consistent',
         '--project-dir', '/opt/airflow/dbt_project',
         '--profiles-dir', '/opt/airflow/dbt_project',
     ]
-    result = subprocess.run(command, capture_output=True, text=True)
+
+    result = subprocess.run(command, capture_output=True, text=True, env=env)
     logging.info(result.stdout)
 
     if result.returncode != 0:
@@ -57,10 +64,10 @@ with DAG(
         task_id="insert_into_final",
         sql=f"""
             INSERT INTO {TAXI_TRIP_RAW_TABLE} (
-                vendorid, tpep_pickup_datetime, tpep_dropoff_datetime , passenger_count , trip_distance ,pickup_longitude, pickup_latitude, RatecodeID, store_and_fwd_flag, dropoff_longitude, dropoff_latitude, payment_type, fare_amount, extra, mta_tax, tip_amount, tolls_amount, improvement_surcharge, total_amount
+                "vendorid", "tpep_pickup_datetime", "tpep_dropoff_datetime", "passenger_count", "trip_distance", "pickup_longitude", "pickup_latitude", "ratecodeid", "store_and_fwd_flag", "dropoff_longitude", "dropoff_latitude", "payment_type", "fare_amount", "extra", "mta_tax", "tip_amount", "tolls_amount", "improvement_surcharge", "total_amount"
             )
             SELECT
-                vendorid, tpep_pickup_datetime, tpep_dropoff_datetime , passenger_count , trip_distance ,pickup_longitude, pickup_latitude, RatecodeID, store_and_fwd_flag, dropoff_longitude, dropoff_latitude, payment_type, fare_amount, extra, mta_tax, tip_amount, tolls_amount, improvement_surcharge, total_amount
+                "vendorid", "tpep_pickup_datetime", "tpep_dropoff_datetime", "passenger_count", "trip_distance", "pickup_longitude", "pickup_latitude", "ratecodeid", "store_and_fwd_flag", "dropoff_longitude", "dropoff_latitude", "payment_type", "fare_amount", "extra", "mta_tax", "tip_amount", "tolls_amount", "improvement_surcharge", "total_amount"
             FROM {TAXI_TRIP_STAGING_TABLE};
             """,
         conn_id=SNOWFLAKE_CONN_ID,

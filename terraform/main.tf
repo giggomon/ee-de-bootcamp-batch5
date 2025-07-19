@@ -80,7 +80,7 @@ resource "snowflake_table" "taxi_trips_raw" {
   name     = var.taxi_trip_raw_table
 
   column {
-    name     = "VendorID"
+    name     = "vendorid"
     type     = "STRING"
     nullable = true
   }
@@ -122,7 +122,7 @@ resource "snowflake_table" "taxi_trips_raw" {
   }
 
   column {
-    name     = "RatecodeID"
+    name     = "ratecodeid"
     type     = "STRING"
     nullable = true
   }
@@ -189,18 +189,6 @@ resource "snowflake_table" "taxi_trips_raw" {
 
   column {
     name     = "total_amount"
-    type     = "STRING"
-    nullable = true
-  }
-
-  column {
-    name     = "trip_duration_minutes"
-    type     = "STRING"
-    nullable = true
-  }
-
-  column {
-    name     = "trip_speed_mph"
     type     = "STRING"
     nullable = true
   }
@@ -249,7 +237,7 @@ resource "snowflake_table" "taxi_trips_staging" {
   name     = var.taxi_trip_staging_table
 
   column {
-    name     = "VendorID"
+    name     = "vendorid"
     type     = "STRING"
     nullable = true
   }
@@ -291,7 +279,7 @@ resource "snowflake_table" "taxi_trips_staging" {
   }
 
   column {
-    name     = "RatecodeID"
+    name     = "ratecodeid"
     type     = "STRING"
     nullable = true
   }
@@ -363,15 +351,13 @@ resource "snowflake_table" "taxi_trips_staging" {
   }
 
   column {
-    name     = "trip_duration_minutes"
-    type     = "STRING"
-    nullable = true
-  }
+    name = "created_timestamp"
+    type = "TIMESTAMP_NTZ"
+    #nullable = true
 
-  column {
-    name     = "trip_speed_mph"
-    type     = "STRING"
-    nullable = true
+    default {
+      expression = "CURRENT_TIMESTAMP()"
+    }
   }
 
   comment    = "Staging table for taxi trips"
