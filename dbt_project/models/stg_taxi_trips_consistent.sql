@@ -22,8 +22,6 @@ SELECT
     CAST("tolls_amount" AS NUMBER(10, 2)) AS tolls_amount,
     CAST("improvement_surcharge" AS NUMBER(10, 2)) AS improvement_surcharge,
     CAST("total_amount" AS NUMBER(10, 2)) AS total_amount,
-    CAST("trip_duration_minutes" AS NUMBER(10, 2)) AS trip_duration_minutes,
-    CAST("trip_speed_mph" AS NUMBER(10, 2)) AS trip_speed_mph,
     CAST("created_timestamp" AS TIMESTAMP) AS created_timestamp
 
 FROM {{ source('raw', 'taxi_trips_raw') }}

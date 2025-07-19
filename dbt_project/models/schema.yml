@@ -4,12 +4,19 @@ models:
   - name: stg_taxi_trips_consistent
     description: "Cleaned and standardised taxi trips data"
     # ──────────────────────────────────────────────────────────────
-    # • Table‑level tests •
+    # • Table‑level/Model tests •
     # ──────────────────────────────────────────────────────────────
     tests:
       - dbt_utils.expression_is_true:
           expression: "tpep_dropoff_datetime >= tpep_pickup_datetime"
           name: pickup_before_dropoff
+
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - vendor_id
+            - tpep_pickup_datetime
+            - pickup_longitude
+            - pickup_latitude
 
     # ──────────────────────────────────────────────────────────────
     # • Column‑level tests •
@@ -36,15 +43,18 @@ models:
       - name: trip_distance
         tests:
           - not_null
+          - non_zero
           - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0.0
+              min_value: 0.00001
               max_value: 9000000.00
       - name: pickup_longitude
         tests:
           - not_null
+          - non_zero
       - name: pickup_latitude
         tests:
           - not_null
+          - non_zero
       - name: ratecode_id
         tests:
           - not_null
@@ -54,9 +64,11 @@ models:
       - name: dropoff_longitude
         tests:
           - not_null
+          - non_zero
       - name: dropoff_latitude
         tests:
           - not_null
+          - non_zero
       - name: payment_type
         tests:
           - not_null
@@ -79,12 +91,6 @@ models:
         tests:
           - not_null
       - name: total_amount
-        tests:
-          - not_null
-      - name: trip_duration_minutes
-        tests:
-          - not_null
-      - name: trip_speed_mph
         tests:
           - not_null
       - name: created_timestamp
