@@ -17,9 +17,9 @@ TAXI_TRIP_GCS_STAGE = "GCS_TAXI_STAGE"
 # DBT model run
 def run_dbt_model():
     env = os.environ.copy()
-    # logging.info(f"DBT_SNOWFLAKE_USER={env.get('DBT_SNOWFLAKE_USER')}")
-    # logging.info(f"DBT_SNOWFLAKE_PWD={'***' if env.get('DBT_SNOWFLAKE_PWD') else None}")
-    # logging.info(f"DBT_SNOWFLAKE_ACCOUNT={env.get('DBT_SNOWFLAKE_ACCOUNT')}")
+    logging.info(f"DBT_SNOWFLAKE_USER={env.get('DBT_SNOWFLAKE_USER')}")
+    logging.info(f"DBT_SNOWFLAKE_PWD={'***' if env.get('DBT_SNOWFLAKE_PWD') else None}")
+    logging.info(f"DBT_SNOWFLAKE_ACCOUNT={env.get('DBT_SNOWFLAKE_ACCOUNT')}")
 
     command = [
         'dbt',
@@ -87,6 +87,7 @@ with DAG(
         task_id="verify_load",
         sql=f"SELECT COUNT(*) AS row_count FROM {TAXI_TRIP_RAW_TABLE}",
         do_xcom_push=True,
+        return_last=True,
         conn_id=SNOWFLAKE_CONN_ID,
     )
 
