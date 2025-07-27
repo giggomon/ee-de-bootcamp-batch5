@@ -5,14 +5,16 @@ from datetime import datetime
 from airflow import DAG
 from airflow.providers.snowflake.transfers.copy_into_snowflake import CopyFromExternalStageToSnowflakeOperator
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
+from airflow.providers.snowflake.hooks.snowflake import SnowflakeHook
 from airflow.operators.python import PythonOperator
+
 
 # Constants
 SNOWFLAKE_CONN_ID = "snowflake_conn"
-TAXI_TRIP_STAGING_TABLE = "TAXI_TRIPS_STAGING"
 TAXI_TRIP_RAW_TABLE = "TAXI_TRIPS_RAW"
 TAXI_TRIP_GCS_STAGE = "GCS_TAXI_STAGE"
 
+# DBT model run
 def run_dbt_model():
     env = os.environ.copy()
     # logging.info(f"DBT_SNOWFLAKE_USER={env.get('DBT_SNOWFLAKE_USER')}")
@@ -38,20 +40,41 @@ def run_dbt_model():
         logging.info("DBT run succeeded")
         logging.info(result.stdout)
 
+# Pre-check task that queries the stage and logs which files are being picked up
+def log_csv_files_in_stage():
+    hook = SnowflakeHook(snowflake_conn_id=SNOWFLAKE_CONN_ID)
+    query = "LIST @{};".format(TAXI_TRIP_GCS_STAGE)
+    results = hook.get_pandas_df(query)
 
+    matched_files = results[results['name'].str.lower().str.endswith('.csv')]['name'].tolist()
+
+    if matched_files:
+        logging.info("CSV files found in stage:")
+        for f in matched_files:
+            logging.info(f" - {f}")
+    else:
+        logging.info("No CSV files found in stage.")
+
+# Define the DAG
 with DAG(
     dag_id = "load_data_taxi_trips",
-    description = "DAG for loading taxi trips data from GCS bucket to Snowflake",
+    description = "DAG for loading taxi trips data from GCS bucket to Snowflake RAW table",
     start_date=datetime(2021, 1, 1),
     tags=["snowflake", "gcs"],
     schedule_interval=None,
     catchup=False,
 ) as dag:
 
-    # 1. Copy from GCS stage to Snowflake table
-    load_to_snowflake = CopyFromExternalStageToSnowflakeOperator(
-        task_id="load_to_snowflake",
-        table=TAXI_TRIP_STAGING_TABLE,
+    # 0. Pre-load file logging
+    log_csv_files_task = PythonOperator(
+        task_id="log_csv_files_in_stage",
+        python_callable=log_csv_files_in_stage,
+    )
+    
+    # 1. Copy from GCS stage to Snowflake RAW table
+    load_to_snowflake_raw = CopyFromExternalStageToSnowflakeOperator(
+        task_id="load_to_snowflake_raw",
+        table=TAXI_TRIP_RAW_TABLE,
         stage=TAXI_TRIP_GCS_STAGE,
         file_format="CSV_FORMAT",
         pattern=".*\\.csv",
@@ -59,21 +82,7 @@ with DAG(
         snowflake_conn_id=SNOWFLAKE_CONN_ID,
     )
 
-    # 2. Insert from staging to final table, letting Snowflake set created_timestamp
-    insert_into_final = SQLExecuteQueryOperator(
-        task_id="insert_into_final",
-        sql=f"""
-            INSERT INTO {TAXI_TRIP_RAW_TABLE} (
-                "vendorid", "tpep_pickup_datetime", "tpep_dropoff_datetime", "passenger_count", "trip_distance", "pickup_longitude", "pickup_latitude", "ratecodeid", "store_and_fwd_flag", "dropoff_longitude", "dropoff_latitude", "payment_type", "fare_amount", "extra", "mta_tax", "tip_amount", "tolls_amount", "improvement_surcharge", "total_amount"
-            )
-            SELECT
-                "vendorid", "tpep_pickup_datetime", "tpep_dropoff_datetime", "passenger_count", "trip_distance", "pickup_longitude", "pickup_latitude", "ratecodeid", "store_and_fwd_flag", "dropoff_longitude", "dropoff_latitude", "payment_type", "fare_amount", "extra", "mta_tax", "tip_amount", "tolls_amount", "improvement_surcharge", "total_amount"
-            FROM {TAXI_TRIP_STAGING_TABLE};
-            """,
-        conn_id=SNOWFLAKE_CONN_ID,
-    )
-
-    # 3. Row Counts
+    # 2. Verify load by checking row count
     verify_load = SQLExecuteQueryOperator(
         task_id="verify_load",
         sql=f"SELECT COUNT(*) AS row_count FROM {TAXI_TRIP_RAW_TABLE}",
@@ -81,11 +90,11 @@ with DAG(
         conn_id=SNOWFLAKE_CONN_ID,
     )
 
-    # 4. Run dbt model
+    # 3. Run dbt model
     run_dbt_task = PythonOperator(
         task_id="run_dbt_model",
         python_callable=run_dbt_model,
     )
 
     # Set dependencies
-    load_to_snowflake >> insert_into_final >> verify_load >> run_dbt_task
+    log_csv_files_task >> load_to_snowflake_raw >> verify_load >> run_dbt_task

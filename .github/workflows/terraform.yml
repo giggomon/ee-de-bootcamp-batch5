@@ -62,8 +62,6 @@ jobs:
         run: | 
           echo "TF_VAR_sample_file_name=${{ secrets.SAMPLE_FILE_NAME }}" >> $GITHUB_ENV
           echo "TF_VAR_taxi_trip_raw_table=${{ secrets.TAXI_TRIP_RAW_TABLE }}" >> $GITHUB_ENV
-          echo "TF_VAR_taxi_trip_staging_table=${{ secrets.TAXI_TRIP_STAGE_TABLE}}" >> $GITHUB_ENV
-
 
       # Debug Variables
       - name: Debug variables
@@ -219,3 +217,6 @@ jobs:
           
           # Parse all DAGs
           airflow dags list
+
+          # Trigger Dag
+          airflow dags trigger taxi_trips.py
