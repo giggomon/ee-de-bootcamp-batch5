@@ -83,7 +83,17 @@ with DAG(
             MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE;
         """,
         conn_id=SNOWFLAKE_CONN_ID
+    )
 
+    # After the COPY task, add this update task:
+    update_load_timestamp = SQLExecuteQueryOperator(
+        task_id="update_load_timestamp",
+        sql=f"""
+            UPDATE {TAXI_TRIP_RAW_TABLE}
+            SET "created_timestamp" = CURRENT_TIMESTAMP()
+            WHERE "created_timestamp" IS NULL;
+        """,
+        conn_id=SNOWFLAKE_CONN_ID
     )
 
     # 2. Verify load by checking row count
@@ -102,4 +112,4 @@ with DAG(
     )
 
     # Set dependencies
-    log_csv_files_task >> load_to_snowflake_raw >> verify_load >> run_dbt_task
+    log_csv_files_task >> load_to_snowflake_raw >> update_load_timestamp >> verify_load >> run_dbt_task
