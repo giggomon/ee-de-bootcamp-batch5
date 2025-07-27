@@ -3,7 +3,7 @@ import logging
 import os
 from datetime import datetime
 from airflow import DAG
-from airflow.providers.snowflake.transfers.copy_into_snowflake import CopyFromExternalStageToSnowflakeOperator
+# from airflow.providers.snowflake.transfers.copy_into_snowflake import CopyFromExternalStageToSnowflakeOperator
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 from airflow.providers.snowflake.hooks.snowflake import SnowflakeHook
 from airflow.operators.python import PythonOperator
@@ -72,14 +72,18 @@ with DAG(
     )
     
     # 1. Copy from GCS stage to Snowflake RAW table
-    load_to_snowflake_raw = CopyFromExternalStageToSnowflakeOperator(
+    load_to_snowflake_raw = SQLExecuteQueryOperator(
         task_id="load_to_snowflake_raw",
-        table=TAXI_TRIP_RAW_TABLE,
-        stage=TAXI_TRIP_GCS_STAGE,
-        file_format="CSV_FORMAT",
-        pattern=".*\\.csv",
-        copy_options="ON_ERROR = 'CONTINUE', MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE, FORCE = FALSE",
-        snowflake_conn_id=SNOWFLAKE_CONN_ID,
+        sql=f"""
+            COPY INTO {TAXI_TRIP_RAW_TABLE} 
+            FROM @{TAXI_TRIP_GCS_STAGE}
+            FILE_FORMAT = (FORMAT_NAME = 'CSV_FORMAT')
+            PATTERN = '.*\\.csv'
+            ON_ERROR = 'CONTINUE'
+            MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE;
+        """,
+        conn_id=SNOWFLAKE_CONN_ID
+
     )
 
     # 2. Verify load by checking row count
