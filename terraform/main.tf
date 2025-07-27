@@ -194,10 +194,10 @@ resource "snowflake_table" "taxi_trips_raw" {
   }
 
   column {
-    name = "created_timestamp"
-    type = "TIMESTAMP_NTZ"
+    name     = "created_timestamp"
+    type     = "TIMESTAMP_NTZ"
     nullable = false
-    
+
     default {
       expression = "CURRENT_TIMESTAMP()"
     }
