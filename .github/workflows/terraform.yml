@@ -62,8 +62,6 @@ jobs:
         run: | 
           echo "TF_VAR_sample_file_name=${{ secrets.SAMPLE_FILE_NAME }}" >> $GITHUB_ENV
           echo "TF_VAR_taxi_trip_raw_table=${{ secrets.TAXI_TRIP_RAW_TABLE }}" >> $GITHUB_ENV
-          echo "TF_VAR_taxi_trip_staging_table=${{ secrets.TAXI_TRIP_STAGE_TABLE}}" >> $GITHUB_ENV
-
 
       # Debug Variables
       - name: Debug variables
@@ -204,7 +202,7 @@ jobs:
           export AIRFLOW__CORE__UNIT_TEST_MODE=True
           export AIRFLOW_VAR_snowflake_account=${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}
           export AIRFLOW_VAR_snowflake_user=${{ secrets.SNOWFLAKE_USER }}
-          export AIRFLOW_VAR_snowflake_pwd=${{ secrets.SNOWFLAKE_PWD }}" >> $GITHUB_ENV
+          export AIRFLOW_VAR_snowflake_pwd=${{ secrets.SNOWFLAKE_PWD }}
           export AIRFLOW_VAR_snowflake_warehouse=${{ secrets.SNOWFLAKE_WH }}
           export AIRFLOW_VAR_snowflake_database=${{ secrets.SNOWFLAKE_DATABASE }}
           export AIRFLOW_VAR_snowflake_schema=${{ secrets.SNOWFLAKE_SCHEMA }}
@@ -219,3 +217,6 @@ jobs:
           
           # Parse all DAGs
           airflow dags list
+
+          # Trigger Dag
+          airflow dags trigger taxi_trips.py

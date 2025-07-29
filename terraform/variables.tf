@@ -103,11 +103,6 @@ variable "snowflake_storage_integration" {
   type        = string
 }
 
-variable "taxi_trip_staging_table" {
-  description = "Taxi Trip Staging Table"
-  type        = string
-}
-
 # variable "snowflake_private_key" {
 #   description = "Private key for Snowflake authentication (contents of the PEM file)"
 #   type        = string

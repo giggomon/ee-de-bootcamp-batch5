@@ -65,6 +65,8 @@ services:
   airflow-webserver:
     <<: *airflow-common
     command: webserver
+    env_file:
+      - .env
     ports:
       - "8080:8080"
     healthcheck:
@@ -87,6 +89,8 @@ services:
   airflow-scheduler:
     <<: *airflow-common
     command: scheduler
+    env_file:
+      - .env
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
       interval: 30s
@@ -103,6 +107,8 @@ services:
     <<: *airflow-common
     command: celery worker
     hostname: airflow-worker
+    env_file:
+      - .env
     container_name: airflow-worker
     volumes:
       - ./airflow/dags:/opt/airflow/dags
