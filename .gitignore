@@ -5,6 +5,7 @@
 *.tfstate
 *.tfstate.backup
 .terraform/
+*.lock.hcl
 
 # Local configuration and secret files
 terraform.tfvars
@@ -18,11 +19,16 @@ snowflake_secrets/
 
 # Airflow
 airflow/logs/
+airflow/dags/__pycache__
 airflow/*.cfg
 airflow/*.pid
 airflow/*.db
 airflow/.env
 
-# env
+
+# others
 .env
-.logs
+.DS_Store
+logs/
+
+
