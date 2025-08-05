@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: "Dimension table for unique pickupdates"
+    columns:
+      - name: date_id
+        description: "Surrogate key in YYYYMMDD integer format."
+        tests:
+          - unique
+          - not_null
+      - name: date
+        description: "Date in standard format"
+        tests:
+          - not_null
+      - name: year
+        description: "Year part of the date"
+        tests:
+          - not_null
+      - name: month
+        description: "Month part of the date"
+        tests:
+          - not_null
+      - name: week
+        description: "Week part of the date"
+        tests:
+          - not_null
+      - name: day
+        description: "Day part of the date"
+        tests:
+          - not_null
+      - name: updated_ts
+        description: "Timestamp of the last update"
+        tests:
+          - not_null

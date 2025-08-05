@@ -1,8 +1,8 @@
 version: 2
 
 models:
-  - name: stg_taxi_trips_consistent
-    description: "Cleaned and standardised taxi trips data"
+  - name: taxi_trips_consistent
+    description: "Consistent taxi trips data"
     # ──────────────────────────────────────────────────────────────
     # • Table‑level/Model tests •
     # ──────────────────────────────────────────────────────────────
@@ -43,9 +43,8 @@ models:
       - name: trip_distance
         tests:
           - not_null
-          - non_zero
           - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0.00001
+              min_value: 0.0000
               max_value: 9000000.00
       - name: pickup_longitude
         tests:

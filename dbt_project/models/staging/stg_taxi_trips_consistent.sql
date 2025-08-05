@@ -150,5 +150,5 @@ FROM deduped
 WHERE row_num = 1
 
 {% if is_incremental() %}
-AND created_timestamp > (SELECT MAX(created_timestamp) FROM {{ this }} ) 
+    AND created_timestamp > (SELECT MAX(created_timestamp) FROM {{ this }} ) 
 {% endif %}

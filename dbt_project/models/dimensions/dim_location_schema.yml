@@ -1,0 +1,31 @@
+version: 2
+
+models:
+  - name: dim_location
+    description: "Dimension table for unique pickup locations"
+    columns:
+      - name: location_id
+        description: "Surrogate key for the location"
+        tests:
+          - unique
+          - not_null
+      - name: pickup_latitude
+        description: "Latitude of the pickup location"
+        tests:
+          - not_null
+      - name: pickup_longitude
+        description: "Longitude of the pickup location"
+        tests:
+          - not_null
+      - name: dropoff_latitude
+        description: "Latitude of the dropoff location"
+        tests:
+          - not_null
+      - name: dropoff_longitude
+        description: "Longitude of the dropoff location"
+        tests:
+          - not_null
+      - name: updated_ts
+        description: "Timestamp of the last update"
+        tests:
+          - not_null

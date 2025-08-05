@@ -1,0 +1,19 @@
+version: 2
+
+models:
+  - name: dim_payment_type
+    description: "Dimension table for unique payment types"
+    columns:
+      - name: payment_type_id
+        description: "Surrogate key for the payment type"
+        tests:
+          - unique
+          - not_null
+      - name: payment_type_name
+        description: "Name of the payment type"
+        tests:
+          - not_null
+      - name: updated_ts
+        description: "Timestamp of the last update"
+        tests:
+          - not_null
