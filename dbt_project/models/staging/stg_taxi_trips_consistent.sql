@@ -1,7 +1,6 @@
 {{ config(
-    materialized='table',
+    materialized='incremental',
     unique_key=['vendor_id', 'tpep_pickup_datetime', 'pickup_longitude', 'pickup_latitude'],
-    partition_by='created_timestamp'
 ) }}
 
 WITH base AS(

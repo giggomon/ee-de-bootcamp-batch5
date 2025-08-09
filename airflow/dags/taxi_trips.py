@@ -13,6 +13,8 @@ from airflow.operators.python import PythonOperator
 SNOWFLAKE_CONN_ID = "snowflake_conn"
 TAXI_TRIP_RAW_TABLE = "TAXI_TRIPS_RAW"
 TAXI_TRIP_GCS_STAGE = "GCS_TAXI_STAGE"
+TAXI_TRIP_TABLE = "MONICA.TAXI_TRIPS_RAW"
+TAXI_TRIP_DB = "EE_SE_DE_DB"
 
 # DBT model run
 def run_dbt_model():
@@ -70,7 +72,23 @@ with DAG(
         task_id="log_csv_files_in_stage",
         python_callable=log_csv_files_in_stage,
     )
-    
+
+    # 0.1 Check COPY_HISTORY Before Copying
+    verify_ingested_files = SQLExecuteQueryOperator(
+        task_id="verify_ingested_files",
+        conn_id=SNOWFLAKE_CONN_ID,
+        sql=f"""
+            SELECT file_name AS filename
+            FROM TABLE(
+                {TAXI_TRIP_DB}.INFORMATION_SCHEMA.COPY_HISTORY(
+                    TABLE_NAME => '{TAXI_TRIP_TABLE}',
+                    START_TIME => DATEADD(day, -7, CURRENT_TIMESTAMP())
+                )
+            );
+        """,
+        do_xcom_push=True,
+    )
+
     # 1. Copy from GCS stage to Snowflake RAW table
     load_to_snowflake_raw = SQLExecuteQueryOperator(
         task_id="load_to_snowflake_raw",
@@ -80,7 +98,9 @@ with DAG(
             FILE_FORMAT = (FORMAT_NAME = 'CSV_FORMAT')
             PATTERN = '.*\\.csv'
             ON_ERROR = 'CONTINUE'
-            MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE;
+            MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
+            PURGE = FALSE
+            FORCE = FALSE;
         """,
         conn_id=SNOWFLAKE_CONN_ID
     )
@@ -112,4 +132,4 @@ with DAG(
     )
 
     # Set dependencies
-    log_csv_files_task >> load_to_snowflake_raw >> update_load_timestamp >> verify_load >> run_dbt_task
+    log_csv_files_task >> verify_ingested_files >> load_to_snowflake_raw >> update_load_timestamp >> verify_load >> run_dbt_task
