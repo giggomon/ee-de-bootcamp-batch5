@@ -42,6 +42,32 @@ def run_dbt_model():
         logging.info("DBT run succeeded")
         logging.info(result.stdout)
 
+# DBT incremental model run
+def run_dbt_incremental_model():
+    env = os.environ.copy()
+    logging.info(f"DBT_SNOWFLAKE_USER={env.get('DBT_SNOWFLAKE_USER')}")
+    logging.info(f"DBT_SNOWFLAKE_PWD={'***' if env.get('DBT_SNOWFLAKE_PWD') else None}")
+    logging.info(f"DBT_SNOWFLAKE_ACCOUNT={env.get('DBT_SNOWFLAKE_ACCOUNT')}")
+
+    command = [
+        'dbt',
+        'run',
+        '--select', 'taxi_trips_consistent',
+        '--project-dir', '/opt/airflow/dbt_project',
+        '--profiles-dir', '/opt/airflow/dbt_project',
+    ]
+
+    result = subprocess.run(command, capture_output=True, text=True, env=env)
+    logging.info(result.stdout)
+
+    if result.returncode != 0:
+        logging.warning("DBT incremental run failed")
+        logging.warning(result.stdout)
+        logging.warning(result.stderr)
+    else:
+        logging.info("DBT incremental run succeeded")
+        logging.info(result.stdout)
+
 # Pre-check task that queries the stage and logs which files are being picked up
 def log_csv_files_in_stage():
     hook = SnowflakeHook(snowflake_conn_id=SNOWFLAKE_CONN_ID)
@@ -131,5 +157,11 @@ with DAG(
         python_callable=run_dbt_model,
     )
 
+    # 4. Run dbt incremental model
+    run_dbt_incremental_task = PythonOperator(
+        task_id="run_dbt_incremental_model",
+        python_callable=run_dbt_incremental_model,
+    )
+
     # Set dependencies
-    log_csv_files_task >> verify_ingested_files >> load_to_snowflake_raw >> update_load_timestamp >> verify_load >> run_dbt_task
+    log_csv_files_task >> verify_ingested_files >> load_to_snowflake_raw >> update_load_timestamp >> verify_load >> run_dbt_task >> run_dbt_incremental_task
