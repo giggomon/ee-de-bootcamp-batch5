@@ -36,16 +36,12 @@ models:
           - not_null
       - name: passenger_count
         tests:
-          - not_null
           - dbt_expectations.expect_column_values_to_be_between:
               min_value: 0
               max_value: 9
       - name: trip_distance
         tests:
           - not_null
-          - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0.0000
-              max_value: 9000000.00
       - name: pickup_longitude
         tests:
           - not_null

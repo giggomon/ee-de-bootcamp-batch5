@@ -5,8 +5,13 @@
     tags=['fact_dim']
 ) }}
 
-WITH locations AS (
-    SELECT DISTINCT
+WITH base AS (
+    SELECT
+        md5(concat_ws('|',
+            pickup_longitude,
+            pickup_latitude,
+            dropoff_longitude,
+            dropoff_latitude)) AS location_id,
         pickup_longitude,
         pickup_latitude,
         dropoff_longitude,
@@ -15,25 +20,15 @@ WITH locations AS (
     FROM {{ ref('taxi_trips_consistent') }}
 
     {% if is_incremental() %}
-        WHERE updated_ts > (SELECT max(updated_ts) FROM {{ this }})
+        WHERE created_timestamp > (SELECT max(updated_ts) FROM {{ this }})
     {% endif %}
 )
 
-SELECT
-    md5(concat_ws('|',
-        pickup_longitude,
-        pickup_latitude,
-        dropoff_longitude,
-        dropoff_latitude)) AS location_id,
-    pickup_longitude,
-    pickup_latitude,
-    dropoff_longitude,
-    dropoff_latitude,
-    updated_ts
-FROM locations
-
 -- Keep only the latest row for each unique coordinate set
+
+SELECT * 
+FROM base
 QUALIFY ROW_NUMBER() OVER (
-    PARTITION BY pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude
+    PARTITION BY location_id
     ORDER BY updated_ts DESC
 ) = 1

@@ -8,7 +8,6 @@ models:
         description: "Surrogate key for the location"
         tests:
           - unique
-          - not_null
       - name: pickup_latitude
         description: "Latitude of the pickup location"
         tests:

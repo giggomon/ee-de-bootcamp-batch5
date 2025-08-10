@@ -9,7 +9,7 @@ WITH base AS (
         md5(concat_ws('|', vendor_id, tpep_pickup_datetime, pickup_longitude, pickup_latitude)) AS trip_id,  -- hashed surrogate key
         vendor_id,
         payment_type,
-        CAST(tpep_pickup_datetime AS date) AS pickup_date,
+        CAST(tpep_pickup_datetime AS date) AS date_id,
         md5(concat_ws('|', pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude)) AS location_id,
         passenger_count,
         trip_distance,
@@ -47,7 +47,7 @@ SELECT
     trip_id,
     vendor_id,
     payment_type AS payment_type_id,
-    to_char(pickup_date, 'YYYYMMDD')::int AS pickup_date_id,
+    to_char(date_id, 'YYYYMMDD')::int AS date_id,
     location_id,
     passenger_count,
     trip_distance,
