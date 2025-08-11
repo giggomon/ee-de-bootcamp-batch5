@@ -85,7 +85,7 @@ def log_csv_files_in_stage():
 
 # Define the DAG
 with DAG(
-    dag_id = "load_data_taxi_trips",
+    dag_id = "taxi_trips",
     description = "DAG for loading taxi trips data from GCS bucket to Snowflake RAW table",
     start_date=datetime(2021, 1, 1),
     tags=["snowflake", "gcs"],

@@ -11,3 +11,6 @@ apache-airflow-providers-google>=10.14.0    # GCS buckets
 # dbt sqlparse>=0.5.1
 dbt-core>=1.6.0
 dbt-snowflake>=1.6.0
+
+# Add this to resolve the protobuf conflict:
+protobuf>=6.31.1,<7.0.0
