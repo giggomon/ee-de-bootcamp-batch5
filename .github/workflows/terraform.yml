@@ -210,9 +210,11 @@ jobs:
           export AIRFLOW_VAR_bucket_name=${{ secrets.GCS_BUCKET_NAME }}
           export AIRFLOW_VAR_taxi_trip_raw_table=${{ secrets.TAXI_TRIP_RAW_TABLE }}
 
-      - name: Validate DAGs with Airflow
+      - name: Run Airflow DAGs in sequence
         run: |
           export AIRFLOW_HOME=$(pwd)
           airflow db init
           airflow dags list
-          airflow dags trigger taxi_trips
+          airflow dags trigger taxi_trips # dbt_run will auto_trigger from dag dependencies
+
+
