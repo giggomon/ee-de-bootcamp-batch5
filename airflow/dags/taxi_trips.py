@@ -13,6 +13,8 @@ from airflow.operators.python import PythonOperator
 SNOWFLAKE_CONN_ID = "snowflake_conn"
 TAXI_TRIP_RAW_TABLE = "TAXI_TRIPS_RAW"
 TAXI_TRIP_GCS_STAGE = "GCS_TAXI_STAGE"
+TAXI_TRIP_TABLE = "MONICA.TAXI_TRIPS_RAW"
+TAXI_TRIP_DB = "EE_SE_DE_DB"
 
 # DBT model run
 def run_dbt_model():
@@ -40,6 +42,32 @@ def run_dbt_model():
         logging.info("DBT run succeeded")
         logging.info(result.stdout)
 
+# DBT incremental model run
+def run_dbt_incremental_model():
+    env = os.environ.copy()
+    logging.info(f"DBT_SNOWFLAKE_USER={env.get('DBT_SNOWFLAKE_USER')}")
+    logging.info(f"DBT_SNOWFLAKE_PWD={'***' if env.get('DBT_SNOWFLAKE_PWD') else None}")
+    logging.info(f"DBT_SNOWFLAKE_ACCOUNT={env.get('DBT_SNOWFLAKE_ACCOUNT')}")
+
+    command = [
+        'dbt',
+        'run',
+        '--select', 'taxi_trips_consistent',
+        '--project-dir', '/opt/airflow/dbt_project',
+        '--profiles-dir', '/opt/airflow/dbt_project',
+    ]
+
+    result = subprocess.run(command, capture_output=True, text=True, env=env)
+    logging.info(result.stdout)
+
+    if result.returncode != 0:
+        logging.warning("DBT incremental run failed")
+        logging.warning(result.stdout)
+        logging.warning(result.stderr)
+    else:
+        logging.info("DBT incremental run succeeded")
+        logging.info(result.stdout)
+
 # Pre-check task that queries the stage and logs which files are being picked up
 def log_csv_files_in_stage():
     hook = SnowflakeHook(snowflake_conn_id=SNOWFLAKE_CONN_ID)
@@ -57,7 +85,7 @@ def log_csv_files_in_stage():
 
 # Define the DAG
 with DAG(
-    dag_id = "load_data_taxi_trips",
+    dag_id = "taxi_trips",
     description = "DAG for loading taxi trips data from GCS bucket to Snowflake RAW table",
     start_date=datetime(2021, 1, 1),
     tags=["snowflake", "gcs"],
@@ -70,7 +98,23 @@ with DAG(
         task_id="log_csv_files_in_stage",
         python_callable=log_csv_files_in_stage,
     )
-    
+
+    # 0.1 Check COPY_HISTORY Before Copying
+    verify_ingested_files = SQLExecuteQueryOperator(
+        task_id="verify_ingested_files",
+        conn_id=SNOWFLAKE_CONN_ID,
+        sql=f"""
+            SELECT file_name AS filename
+            FROM TABLE(
+                {TAXI_TRIP_DB}.INFORMATION_SCHEMA.COPY_HISTORY(
+                    TABLE_NAME => '{TAXI_TRIP_TABLE}',
+                    START_TIME => DATEADD(day, -7, CURRENT_TIMESTAMP())
+                )
+            );
+        """,
+        do_xcom_push=True,
+    )
+
     # 1. Copy from GCS stage to Snowflake RAW table
     load_to_snowflake_raw = SQLExecuteQueryOperator(
         task_id="load_to_snowflake_raw",
@@ -80,7 +124,9 @@ with DAG(
             FILE_FORMAT = (FORMAT_NAME = 'CSV_FORMAT')
             PATTERN = '.*\\.csv'
             ON_ERROR = 'CONTINUE'
-            MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE;
+            MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
+            PURGE = FALSE
+            FORCE = FALSE;
         """,
         conn_id=SNOWFLAKE_CONN_ID
     )
@@ -111,5 +157,11 @@ with DAG(
         python_callable=run_dbt_model,
     )
 
+    # 4. Run dbt incremental model
+    run_dbt_incremental_task = PythonOperator(
+        task_id="run_dbt_incremental_model",
+        python_callable=run_dbt_incremental_model,
+    )
+
     # Set dependencies
-    log_csv_files_task >> load_to_snowflake_raw >> update_load_timestamp >> verify_load >> run_dbt_task
+    log_csv_files_task >> verify_ingested_files >> load_to_snowflake_raw >> update_load_timestamp >> verify_load >> run_dbt_task >> run_dbt_incremental_task

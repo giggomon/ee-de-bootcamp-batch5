@@ -11,3 +11,9 @@ clean-targets: ["target", "dbt_modules"]
 # models:
 #   taxi_dbt_project:
 #     +materialized: view
+models:
+  taxi_dbt_project:
+    staging:     # corresponds to models/staging/
+      +materialized: incremental
+    core:        # corresponds to models/core/
+      +materialized: incremental

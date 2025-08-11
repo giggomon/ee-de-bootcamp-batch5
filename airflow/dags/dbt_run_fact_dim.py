@@ -28,7 +28,7 @@ def run_dbt_model():
         
 # Define the DAG
 with DAG(
-    dag_id='dbt_run_fact_and_dimensions',
+    dag_id='dbt_run_fact_dim',
     start_date=datetime(2023, 1, 1),
     schedule_interval=None,  # or set to None for manual runs
     catchup=False,

@@ -9,30 +9,17 @@ with dates as (
         cast(tpep_pickup_datetime AS date) AS date_val,
         created_timestamp AS updated_ts
     FROM {{ ref('taxi_trips_consistent') }}
-),
-
-base AS (
-    SELECT
-        to_char(date_val, 'YYYYMMDD')::int AS date_id,
-        date_val AS date,
-        extract(year from date_val) AS year,
-        extract(month from date_val) AS month,
-        extract(week from date_val) AS week,
-        extract(day from date_val) AS day,
-        updated_ts
-    FROM dates
-
     {% if is_incremental() %}
-        WHERE updated_ts > (SELECT MAX(updated_ts) FROM {{ this }})
+        where created_timestamp > (select max(updated_ts) from {{ this }})
     {% endif %}
 )
 
 SELECT
-    date_id,
-    date,
-    year,
-    month,
-    week,
-    day,
+    cast(to_char(date_val, 'YYYYMMDD') as int) as date_id,
+    date_val as date,
+    extract(year from date_val) as year,
+    extract(month from date_val) as month,
+    extract(week from date_val) as week,
+    extract(day from date_val) as day,
     updated_ts
-FROM base
+FROM dates
