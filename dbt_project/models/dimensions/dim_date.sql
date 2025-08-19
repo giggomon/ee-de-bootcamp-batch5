@@ -17,9 +17,18 @@ with dates as (
 SELECT
     cast(to_char(date_val, 'YYYYMMDD') as int) as date_id,
     date_val as date,
-    extract(year from date_val) as year,
+
+    --ISO compatible year/week
+    YEAROFWEEKISO(date_val) as year,
     extract(month from date_val) as month,
-    extract(week from date_val) as week,
+    WEEKISO(date_val) as week,
     extract(day from date_val) as day,
+
+    -- Week start = Monday of the ISO week
+    dateadd(day, 1 - dayofweekiso(date_val), date_val) as week_start_date,
+
+    -- Week end = Sunday (week_start + 6 days)
+    dateadd(day, 7 - dayofweekiso(date_val), date_val) as week_end_date,
+
     updated_ts
 FROM dates
