@@ -24,7 +24,7 @@ weekly_growth AS (
         total_trips,
         week_start_date,
         week_end_date,
-        LAG(total_trips) OVER (ORDER BY week_start_date) AS prev_week_trips
+        LAG(total_trips) OVER (ORDER BY year_num, week_num) AS prev_week_trips
     FROM weekly_trips
 )
 
@@ -40,4 +40,4 @@ SELECT
         ELSE ROUND(((total_trips - prev_week_trips) / prev_week_trips) * 100, 2)
     END AS wow_growth_rate
 FROM weekly_growth
-ORDER BY week_start_date
+ORDER BY year_num, week_num

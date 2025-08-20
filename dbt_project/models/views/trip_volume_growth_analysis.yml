@@ -1,0 +1,43 @@
+version: 2
+
+models:
+  - name: trip_volume_growth_analysis
+    description: "Week-over-week trip growth analysis for taxi trips"
+    
+    columns:
+      - name: year_num
+        description: "Year of the trip"
+        tests:
+          - not_null
+
+      - name: month_num
+        description: "Month of the trip"
+        tests:
+          - not_null
+
+      - name: week_num
+        description: "ISO week number of the trip"
+        tests:
+          - not_null
+
+      - name: week_start_date
+        description: "Start date of the ISO week"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: week_start_date
+
+      - name: week_end_date
+        description: "End date of the ISO week"
+        tests:
+          - not_null
+
+      - name: total_trips
+        description: "Total number of trips in the week"
+        tests:
+          - not_null
+
+      - name: prev_week_trips
+        description: "Total trips in the previous week (used for WoW calculation)"
+
